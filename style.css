@@ -1,0 +1,187 @@
+/* --- Variables de Diseño Editorial --- */
+:root {
+    --bg-color: #fcfcfc;
+    --text-color: #111111;
+    --accent-color: #7a7a7a;
+    --card-bg: #ffffff;
+    --font-main: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    scroll-behavior: smooth; /* Hace que el salto de menú sea suave */
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: var(--font-main);
+    overflow-x: hidden;
+}
+
+/* --- Barra de Navegación Fija --- */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 30px 50px;
+    z-index: 1000;
+    background: rgba(252, 252, 252, 0.8);
+    backdrop-filter: blur(10px); /* Efecto vidrio esmerilado */
+}
+
+.logo {
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: var(--text-color);
+    margin-left: 30px;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: color 0.3s;
+}
+
+.nav-links a:hover {
+    color: var(--accent-color);
+}
+
+/* --- Estilo de Secciones Generales --- */
+.section {
+    min-height: 100vh;
+    padding: 120px 50px 50px 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+h2 {
+    font-size: 1.5rem;
+    font-weight: 400;
+    letter-spacing: 3px;
+    margin-bottom: 40px;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 15px;
+}
+
+/* --- Portada (Hero) --- */
+.hero-section {
+    background: #111111;
+    color: #ffffff;
+    text-align: center;
+}
+
+.hero-content h1 {
+    font-size: 7vw;
+    font-weight: 900;
+    letter-spacing: -2px;
+    line-height: 0.9;
+}
+
+.hero-content p {
+    font-size: 1.2rem;
+    margin-top: 20px;
+    letter-spacing: 1px;
+    color: #888888;
+}
+
+/* --- Grid de Portafolio (Maquetación limpia) --- */
+.grid-portfolio {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    gap: 40px;
+}
+
+.card {
+    background: var(--card-bg);
+    border: 1px solid #eeeeee;
+    overflow: hidden;
+    transition: transform 0.4s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card img {
+    width: 100%;
+    height: auto;
+    display: block;
+    filter: grayscale(20%);
+    transition: filter 0.3s;
+}
+
+.card:hover img {
+    filter: grayscale(0%);
+}
+
+.card-info {
+    padding: 20px;
+}
+
+.card-info h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.card-info p {
+    color: var(--accent-color);
+    font-size: 0.9rem;
+}
+
+.item-wide {
+    grid-column: 1 / -1; /* Ocupa todo el ancho en planos técnicos */
+}
+
+/* --- Sección Contacto --- */
+.footer-section {
+    align-items: center;
+    text-align: center;
+    background: #fafafa;
+}
+
+.btn-contact {
+    display: inline-block;
+    margin-top: 30px;
+    padding: 15px 40px;
+    border: 1px solid #111111;
+    color: #111111;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    transition: all 0.3s ease;
+}
+
+.btn-contact:hover {
+    background: #111111;
+    color: #ffffff;
+}
+
+/* --- 🌟 Efecto Mágico: Scroll Reveal (CSS Nativo) 🌟 --- */
+@keyframes revealEffect {
+    from {
+        opacity: 0;
+        transform: translateY(80px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.reveal {
+    animation: revealEffect linear both;
+    animation-timeline: view(); /* Vincula la animación a la vista del scroll */
+    animation-range: entry 10% cover 40%; /* Define cuándo empieza y termina de aparecer */
+}
