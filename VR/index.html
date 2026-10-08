@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Tour Virtual 360</title>
+    
+    <!-- Estilos de Photo Sphere Viewer y el Plugin de Tour Virtual -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core/index.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/virtual-tour-plugin/index.min.css" />
+    
+    <!-- Tus estilos personalizados -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Contenedor donde se renderizará el tour -->
+    <div id="viewer"></div>
+
+    <!-- Dependencias: Three.js (requerido por PSV v5) -->
+    <script src="https://cdn.jsdelivr.net/npm/three/build/three.min.js"></script>
+    <!-- Núcleo de Photo Sphere Viewer -->
+    <script src="https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core/index.min.js"></script>
+    <!-- Plugin de Tour Virtual -->
+    <script src="https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/virtual-tour-plugin/index.min.js"></script>
+    
+    <!-- Tu lógica -->
+    <script src="script.js"></script>
+</body>
+</html>
