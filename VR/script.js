@@ -8,46 +8,43 @@ document.addEventListener('DOMContentLoaded', () => {
         loadingImg: 'https://photo-sphere-viewer.js.org/assets/loader.gif'
     });
 
-    // Función para agregar markers según la escena actual
     function addMarkersForScene(sceneName) {
-        // Limpiamos markers anteriores
         viewer.clearMarkers();
 
         if (sceneName === 'hall') {
             viewer.addMarker({
                 id: 'marker-comedor',
-                position: { yaw: Math.PI / 2, pitch: 0 },
-                image: 'https://cdn-icons-png.flaticon.com/512/271/271220.png', // Flecha blanca
-                size: { width: 48, height: 48 },
-                tooltip: 'Ir al Comedor',
+                position: { yaw: 0, pitch: 0 }, // Centro de la vista
+                html: '<div style="background: red; color: white; padding: 15px 25px; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">IR AL COMEDOR →</div>',
                 anchor: 'center center',
-                onClick: () => {
-                    viewer.setPanorama(basePath + 'assets/comedor.jpg');
-                    setTimeout(() => addMarkersForScene('comedor'), 500);
-                }
+                tooltip: 'Haz clic para ir al comedor'
             });
         } else if (sceneName === 'comedor') {
             viewer.addMarker({
                 id: 'marker-hall',
-                position: { yaw: -Math.PI / 2, pitch: 0 },
-                image: 'https://cdn-icons-png.flaticon.com/512/271/271220.png',
-                size: { width: 48, height: 48 },
-                tooltip: 'Volver al Hall',
+                position: { yaw: 0, pitch: 0 },
+                html: '<div style="background: blue; color: white; padding: 15px 25px; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">← VOLVER AL HALL</div>',
                 anchor: 'center center',
-                onClick: () => {
-                    viewer.setPanorama(basePath + 'assets/hall.jpg');
-                    setTimeout(() => addMarkersForScene('hall'), 500);
-                }
+                tooltip: 'Haz clic para volver al hall'
             });
         }
     }
 
-    // Cuando el visor está listo, agregamos los markers iniciales
     viewer.addEventListener('ready', () => {
         addMarkersForScene('hall');
+
+        // Agregamos el evento click al marker
+        viewer.on('click', (e, data) => {
+            if (data && data.id === 'marker-comedor') {
+                viewer.setPanorama(basePath + 'assets/comedor.jpg');
+                setTimeout(() => addMarkersForScene('comedor'), 500);
+            } else if (data && data.id === 'marker-hall') {
+                viewer.setPanorama(basePath + 'assets/hall.jpg');
+                setTimeout(() => addMarkersForScene('hall'), 500);
+            }
+        });
     });
 
-    // Cuando cambia la panorámica, actualizamos los markers
     viewer.addEventListener('panorama-loaded', () => {
         const currentPanorama = viewer.getPanorama();
         if (currentPanorama.includes('comedor')) {
