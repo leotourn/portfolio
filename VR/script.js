@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 markers: [
                     {
                         id: 'marker-comedor',
-                        position: { yaw: 0, pitch: 0 },
+                        position: { yaw: -2, pitch: -0.2 },
                         html: '<div style="background: red; color: white; padding: 15px 25px; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); white-space: nowrap;">IR AL COMEDOR</div>',
                         anchor: 'center center',
                         tooltip: 'Haz clic para ir al comedor'
