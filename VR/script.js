@@ -1,16 +1,15 @@
-// Esperamos a que el DOM esté listo
 document.addEventListener('DOMContentLoaded', () => {
+    const basePath = '/portfolio/VR/';
 
-    // 1. Definimos las escenas (nodos) del tour
     const nodes = [
         {
             id: 'hall',
             name: 'Hall de Acceso',
-            panorama: 'assets/hall.jpg', // Ruta a tu render de Blender
+            panorama: basePath + 'assets/hall.jpg',
             links: [
                 {
-                    target: 'comedor', // ID de la escena a la que conecta
-                    position: { yaw: Math.PI / 2, pitch: 0 }, // Dónde colocar el hotspot (90 grados a la derecha)
+                    target: 'comedor',
+                    position: { yaw: Math.PI / 2, pitch: 0 },
                     name: 'Ir al Comedor'
                 }
             ]
@@ -18,32 +17,28 @@ document.addEventListener('DOMContentLoaded', () => {
         {
             id: 'comedor',
             name: 'Comedor',
-            panorama: 'assets/comedor.jpg',
+            panorama: basePath + 'assets/comedor.jpg',
             links: [
                 {
                     target: 'hall',
-                    position: { yaw: -Math.PI / 2, pitch: 0 }, // 90 grados a la izquierda
-                    name: 'Volver al Hall de Acceso'
+                    position: { yaw: -Math.PI / 2, pitch: 0 },
+                    name: 'Volver al Hall'
                 }
             ]
         }
     ];
 
-    // 2. Inicializamos el visor
     const viewer = new PhotoSphereViewer.Viewer({
         container: document.querySelector('#viewer'),
+        panorama: basePath + 'assets/hall.jpg', // Panorama inicial
         plugins: [
             [PhotoSphereViewer.VirtualTourPlugin, {
                 nodes: nodes,
-                defaultNode: 'hall', // Escena inicial
-                renderMode: '3d' // '3d' da un efecto de profundidad al cambiar de escena
-            }],
-            // Opcional: Barra de navegación (brújula, zoom, pantalla completa)
-            [PhotoSphereViewer.NavigationBarPlugin, {
-                buttons: ['zoom', 'move', 'fullscreen']
+                defaultNode: 'hall',
+                renderMode: '3d'
             }]
         ],
-        navbar: false, // Lo manejamos con el plugin de navegación arriba
+        navbar: ['zoom', 'move', 'fullscreen', 'gyroscope'], // Barra de navegación integrada
         loadingImg: 'https://photo-sphere-viewer.js.org/assets/loader.gif'
     });
 });
