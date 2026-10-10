@@ -11,18 +11,11 @@ document.addEventListener('DOMContentLoaded', () => {
             fov: 75,   // Campo de visión amplio
             markers: [
                 {
-                    id: 'marker-comedor',
+                    id: 'marker-hall',
                     position: { yaw: Math.PI / 2, pitch: 0 }, // Ajusta con el truco del clic
                     html: '<div style="background: red; color: white; padding: 15px 25px; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); white-space: nowrap;">IR AL COMEDOR →</div>',
-                    tooltip: 'Haz clic para ir al comedor',
-                    targetScene: 'comedor' // A dónde lleva este botón
-                },
-                {
-                    id: 'marker-cocina',
-                    position: { yaw: -Math.PI / 2, pitch: 0 },
-                    html: '<div style="background: green; color: white; padding: 15px 25px; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); white-space: nowrap;">IR A LA COCINA →</div>',
-                    tooltip: 'Haz clic para ir a la cocina',
-                    targetScene: 'cocina'
+                    tooltip: 'Haz clic para entrar',
+                    targetScene: 'hall' // A dónde lleva este botón
                 }
             ]
         },
@@ -32,11 +25,25 @@ document.addEventListener('DOMContentLoaded', () => {
             fov: 60,
             markers: [
                 {
-                    id: 'marker-hall',
+                    id: 'marker-comedor',
                     position: { yaw: -Math.PI / 2, pitch: 0 },
                     html: '<div style="background: blue; color: white; padding: 15px 25px; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); white-space: nowrap;">← VOLVER AL HALL</div>',
                     tooltip: 'Haz clic para volver al hall',
-                    targetScene: 'hall'
+                    targetScene: 'comedor'
+                },
+                {
+                    id: 'marker-pasillo',
+                    position: { yaw: -Math.PI / 2, pitch: 0 },
+                    html: '<div style="background: green; color: white; padding: 15px 25px; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); white-space: nowrap;">IR A LA COCINA →</div>',
+                    tooltip: 'Haz clic para ir a la cocina',
+                    targetScene: 'pasillo'
+                },
+                {
+                    id: 'marker-acceso-desde-hall',
+                    position: { yaw: -Math.PI / 2, pitch: 0 },
+                    html: '<div style="background: green; color: white; padding: 15px 25px; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); white-space: nowrap;">IR A LA COCINA →</div>',
+                    tooltip: 'Haz clic para ir a la cocina',
+                    targetScene: 'acceso'
                 }
             ]
         },
@@ -46,10 +53,17 @@ document.addEventListener('DOMContentLoaded', () => {
             fov: 70,
             markers: [
                 {
-                    id: 'marker-hall-desde-cocina',
+                    id: 'marker-cocina',
                     position: { yaw: Math.PI, pitch: 0 }, // Detrás de ti
                     html: '<div style="background: blue; color: white; padding: 15px 25px; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); white-space: nowrap;">← VOLVER AL HALL</div>',
                     tooltip: 'Haz clic para volver al hall',
+                    targetScene: 'cocina'
+                },
+                {
+                    id: 'marker-hall-desde-comedor',
+                    position: { yaw: -Math.PI / 2, pitch: 0 },
+                    html: '<div style="background: green; color: white; padding: 15px 25px; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); white-space: nowrap;">IR A LA COCINA →</div>',
+                    tooltip: 'Haz clic para ir a la cocina',
                     targetScene: 'hall'
                 }
             ]
@@ -60,11 +74,11 @@ document.addEventListener('DOMContentLoaded', () => {
             fov: 70,
             markers: [
                 {
-                    id: 'marker-hall-desde-cocina',
+                    id: 'marker-comedor-desde-cocina',
                     position: { yaw: Math.PI, pitch: 0 }, // Detrás de ti
                     html: '<div style="background: blue; color: white; padding: 15px 25px; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); white-space: nowrap;">← VOLVER AL HALL</div>',
                     tooltip: 'Haz clic para volver al hall',
-                    targetScene: 'hall'
+                    targetScene: 'comedor'
                 }
             ]
         },
@@ -74,11 +88,18 @@ document.addEventListener('DOMContentLoaded', () => {
             fov: 70,
             markers: [
                 {
-                    id: 'marker-hall-desde-cocina',
+                    id: 'marker-hall-desde-pasillo',
                     position: { yaw: Math.PI, pitch: 0 }, // Detrás de ti
                     html: '<div style="background: blue; color: white; padding: 15px 25px; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); white-space: nowrap;">← VOLVER AL HALL</div>',
                     tooltip: 'Haz clic para volver al hall',
                     targetScene: 'hall'
+                },
+                {
+                    id: 'marker-dormitorio',
+                    position: { yaw: -Math.PI / 2, pitch: 0 },
+                    html: '<div style="background: green; color: white; padding: 15px 25px; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); white-space: nowrap;">IR A LA COCINA →</div>',
+                    tooltip: 'Haz clic para ir a la cocina',
+                    targetScene: 'dormitorio'
                 }
             ]
         },
@@ -88,17 +109,17 @@ document.addEventListener('DOMContentLoaded', () => {
             fov: 70,
             markers: [
                 {
-                    id: 'marker-hall-desde-cocina',
+                    id: 'marker-pasillo-desde-dormitorio',
                     position: { yaw: Math.PI, pitch: 0 }, // Detrás de ti
                     html: '<div style="background: blue; color: white; padding: 15px 25px; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); white-space: nowrap;">← VOLVER AL HALL</div>',
                     tooltip: 'Haz clic para volver al hall',
-                    targetScene: 'hall'
+                    targetScene: 'pasillo'
                 }
             ]
         }
     };
 
-    let currentSceneId = 'hall';
+    let currentSceneId = 'acceso';
 
     // 3. Inicializar el Visor
     const viewer = new PhotoSphereViewer.Viewer({
@@ -163,6 +184,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 6. Iniciar el tour
     viewer.addEventListener('ready', () => {
-        loadScene('hall');
+        loadScene('acceso');
     });
 });
