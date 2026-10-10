@@ -3,116 +3,116 @@ document.addEventListener('DOMContentLoaded', () => {
     const hostname = window.location.hostname;
     const basePath = (hostname === 'localhost' || hostname === '127.0.0.1') ? 'assets/' : '/portfolio/VR/assets/';
 
-    // 2. CONFIGURACIÓN DE TODAS LAS ESCENAS (Aquí agregas nuevas habitaciones fácilmente)
+    // 2. CONFIGURACIÓN DE TODAS LAS ESCENAS
     const scenes = {
         acceso: {
             panorama: basePath + '0001.jpg',
-            zoom: 50,  // Zoom normal (0-100)
-            fov: 75,   // Campo de visión amplio
+            zoom: 0,
+            fov: 100,
             markers: [
                 {
                     id: 'marker-hall',
-                    position: { yaw: 0, pitch: 0 }, // Ajusta con el truco del clic
-                    html: '<div style="background: red; color: white; padding: 15px 25px; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); white-space: nowrap;">IR AL COMEDOR →</div>',
+                    position: { yaw: 0, pitch: 0 },
+                    html: '<div class="vr-button">ENTRAR</div>', // ¡Mucho más limpio!
                     tooltip: 'Haz clic para entrar',
-                    targetScene: 'hall' // A dónde lleva este botón
+                    targetScene: 'hall'
                 }
             ]
         },
         hall: {
             panorama: basePath + '0002.jpg',
-            zoom: 60,
-            fov: 60,
+            zoom: 0,
+            fov: 100,
             markers: [
                 {
                     id: 'marker-comedor',
-                    position: { yaw: 0, pitch: 0 },
-                    html: '<div style="background: blue; color: white; padding: 15px 25px; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); white-space: nowrap;">← VOLVER AL HALL</div>',
-                    tooltip: 'Haz clic para volver al hall',
+                    position: { yaw: -Math.PI / 2, pitch: 0 },
+                    html: '<div class="vr-button">IR AL COMEDOR</div>',
+                    tooltip: 'Haz clic para ir al Comedor',
                     targetScene: 'comedor'
                 },
                 {
                     id: 'marker-pasillo',
                     position: { yaw: Math.PI / 2, pitch: 0 },
-                    html: '<div style="background: green; color: white; padding: 15px 25px; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); white-space: nowrap;">IR A LA COCINA →</div>',
-                    tooltip: 'Haz clic para ir a la cocina',
+                    html: '<div class="vr-button">IR AL PASILLO</div>',
+                    tooltip: 'Haz clic para ir al Pasillo',
                     targetScene: 'pasillo'
                 },
                 {
                     id: 'marker-acceso-desde-hall',
-                    position: { yaw: -Math.PI / 2, pitch: 0 },
-                    html: '<div style="background: green; color: white; padding: 15px 25px; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); white-space: nowrap;">IR A LA COCINA →</div>',
-                    tooltip: 'Haz clic para ir a la cocina',
+                    position: { yaw: Math.PI, pitch: 0 },
+                    html: '<div class="vr-button">SALIR</div>',
+                    tooltip: 'Haz clic para salir',
                     targetScene: 'acceso'
                 }
             ]
         },
         comedor: {
-            panorama: basePath + '0003.jpg', // ¡Asegúrate de tener cocina.jpg en la carpeta assets!
-            zoom: 50,
-            fov: 70,
+            panorama: basePath + '0003.jpg',
+            zoom: 0,
+            fov: 100,
             markers: [
                 {
                     id: 'marker-cocina',
-                    position: { yaw: Math.PI, pitch: 0 }, // Detrás de ti
-                    html: '<div style="background: blue; color: white; padding: 15px 25px; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); white-space: nowrap;">← VOLVER AL HALL</div>',
-                    tooltip: 'Haz clic para volver al hall',
+                    position: { yaw: Math.PI, pitch: 0 },
+                    html: '<div class="vr-button">IR A LA COCINA</div>',
+                    tooltip: 'Haz clic para ir a la cocina',
                     targetScene: 'cocina'
                 },
                 {
                     id: 'marker-hall-desde-comedor',
-                    position: { yaw: -Math.PI / 2, pitch: 0 },
-                    html: '<div style="background: green; color: white; padding: 15px 25px; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); white-space: nowrap;">IR A LA COCINA →</div>',
-                    tooltip: 'Haz clic para ir a la cocina',
+                    position: { yaw: Math.PI / 2, pitch: 0 },
+                    html: '<div class="vr-button">VOLVER AL HALL</div>',
+                    tooltip: 'Haz clic para volver al hall',
                     targetScene: 'hall'
                 }
             ]
         },
         cocina: {
-            panorama: basePath + '0004.jpg', // ¡Asegúrate de tener cocina.jpg en la carpeta assets!
-            zoom: 50,
+            panorama: basePath + '0004.jpg',
+            zoom: 0,
             fov: 70,
             markers: [
                 {
                     id: 'marker-comedor-desde-cocina',
-                    position: { yaw: Math.PI, pitch: 0 }, // Detrás de ti
-                    html: '<div style="background: blue; color: white; padding: 15px 25px; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); white-space: nowrap;">← VOLVER AL HALL</div>',
-                    tooltip: 'Haz clic para volver al hall',
+                    position: { yaw: 0, pitch: 0 },
+                    html: '<div class="vr-button">VOLVER AL COMEDOR</div>',
+                    tooltip: 'Haz clic para volver al comedor',
                     targetScene: 'comedor'
                 }
             ]
         },
         pasillo: {
-            panorama: basePath + '0005.jpg', // ¡Asegúrate de tener cocina.jpg en la carpeta assets!
-            zoom: 50,
+            panorama: basePath + '0005.jpg',
+            zoom: 0,
             fov: 70,
             markers: [
                 {
                     id: 'marker-hall-desde-pasillo',
-                    position: { yaw: Math.PI, pitch: 0 }, // Detrás de ti
-                    html: '<div style="background: blue; color: white; padding: 15px 25px; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); white-space: nowrap;">← VOLVER AL HALL</div>',
+                    position: { yaw: -Math.PI / 2, pitch: 0 },
+                    html: '<div class="vr-button">VOLVER AL HALL</div>',
                     tooltip: 'Haz clic para volver al hall',
                     targetScene: 'hall'
                 },
                 {
                     id: 'marker-dormitorio',
-                    position: { yaw: -Math.PI / 2, pitch: 0 },
-                    html: '<div style="background: green; color: white; padding: 15px 25px; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); white-space: nowrap;">IR A LA COCINA →</div>',
-                    tooltip: 'Haz clic para ir a la cocina',
+                    position: { yaw: Math.PI / 2, pitch: 0 },
+                    html: '<div class="vr-button">IR AL DORMITORIO</div>',
+                    tooltip: 'Haz clic para ir al dormitorio',
                     targetScene: 'dormitorio'
                 }
             ]
         },
         dormitorio: {
-            panorama: basePath + '0006.jpg', // ¡Asegúrate de tener cocina.jpg en la carpeta assets!
-            zoom: 50,
+            panorama: basePath + '0006.jpg',
+            zoom: 0,
             fov: 70,
             markers: [
                 {
                     id: 'marker-pasillo-desde-dormitorio',
-                    position: { yaw: Math.PI, pitch: 0 }, // Detrás de ti
-                    html: '<div style="background: blue; color: white; padding: 15px 25px; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); white-space: nowrap;">← VOLVER AL HALL</div>',
-                    tooltip: 'Haz clic para volver al hall',
+                    position: { yaw: -Math.PI / 2, pitch: 0 },
+                    html: '<div class="vr-button">VOLVER AL PASILLO</div>',
+                    tooltip: 'Haz clic para volver al pasillo',
                     targetScene: 'pasillo'
                 }
             ]
@@ -127,11 +127,11 @@ document.addEventListener('DOMContentLoaded', () => {
         panorama: scenes[currentSceneId].panorama,
         navbar: ['zoom', 'move', 'fullscreen'],
         loadingImg: 'https://photo-sphere-viewer.js.org/assets/loader.gif',
-        defaultZoomLvl: 50,
+        defaultZoomLvl: 0,
         minFov: 30,
-        maxFov: 90,
+        maxFov: 100, // Ajustado para que coincida con tu fov inicial de 100
         plugins: [
-            [PhotoSphereViewer.MarkersPlugin, {}] // Se inicializa vacío, lo llenamos dinámicamente
+            [PhotoSphereViewer.MarkersPlugin, {}]
         ]
     });
 
@@ -146,14 +146,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         currentSceneId = sceneId;
-
-        // A. Cambiar la imagen de fondo
         viewer.setPanorama(scene.panorama);
-
-        // B. Limpiar los botones (markers) de la escena anterior
         markersPlugin.clearMarkers();
 
-        // C. Agregar los nuevos botones de esta escena
         scene.markers.forEach(markerData => {
             markersPlugin.addMarker({
                 id: markerData.id,
@@ -164,16 +159,14 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // D. Animar el zoom/fov suavemente
         viewer.animate({
             zoom: scene.zoom,
-            duration: 1500 // 1.5 segundos de animación
+            duration: 1500 // 1.5 segundos (4500 era un poco lento para la navegación)
         });
     }
 
     // 5. Evento: Al hacer clic en un botón/marker
     markersPlugin.addEventListener('select-marker', (e) => {
-        // Buscamos en la configuración actual a dónde debe llevar este marker
         const currentSceneData = scenes[currentSceneId];
         const clickedMarker = currentSceneData.markers.find(m => m.id === e.marker.id);
 
