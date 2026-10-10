@@ -5,8 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 2. CONFIGURACIÓN DE TODAS LAS ESCENAS (Aquí agregas nuevas habitaciones fácilmente)
     const scenes = {
-        hall: {
-            panorama: basePath + 'hall.jpg',
+        acceso: {
+            panorama: basePath + '0001.jpg',
             zoom: 50,  // Zoom normal (0-100)
             fov: 75,   // Campo de visión amplio
             markers: [
@@ -26,8 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             ]
         },
-        comedor: {
-            panorama: basePath + 'comedor.jpg',
+        hall: {
+            panorama: basePath + '0002.jpg',
             zoom: 60,
             fov: 60,
             markers: [
@@ -40,8 +40,50 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             ]
         },
+        comedor: {
+            panorama: basePath + '0003.jpg', // ¡Asegúrate de tener cocina.jpg en la carpeta assets!
+            zoom: 50,
+            fov: 70,
+            markers: [
+                {
+                    id: 'marker-hall-desde-cocina',
+                    position: { yaw: Math.PI, pitch: 0 }, // Detrás de ti
+                    html: '<div style="background: blue; color: white; padding: 15px 25px; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); white-space: nowrap;">← VOLVER AL HALL</div>',
+                    tooltip: 'Haz clic para volver al hall',
+                    targetScene: 'hall'
+                }
+            ]
+        },
         cocina: {
-            panorama: basePath + 'cocina.jpg', // ¡Asegúrate de tener cocina.jpg en la carpeta assets!
+            panorama: basePath + '0004.jpg', // ¡Asegúrate de tener cocina.jpg en la carpeta assets!
+            zoom: 50,
+            fov: 70,
+            markers: [
+                {
+                    id: 'marker-hall-desde-cocina',
+                    position: { yaw: Math.PI, pitch: 0 }, // Detrás de ti
+                    html: '<div style="background: blue; color: white; padding: 15px 25px; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); white-space: nowrap;">← VOLVER AL HALL</div>',
+                    tooltip: 'Haz clic para volver al hall',
+                    targetScene: 'hall'
+                }
+            ]
+        },
+        pasillo: {
+            panorama: basePath + '0005.jpg', // ¡Asegúrate de tener cocina.jpg en la carpeta assets!
+            zoom: 50,
+            fov: 70,
+            markers: [
+                {
+                    id: 'marker-hall-desde-cocina',
+                    position: { yaw: Math.PI, pitch: 0 }, // Detrás de ti
+                    html: '<div style="background: blue; color: white; padding: 15px 25px; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); white-space: nowrap;">← VOLVER AL HALL</div>',
+                    tooltip: 'Haz clic para volver al hall',
+                    targetScene: 'hall'
+                }
+            ]
+        },
+        dormitorio: {
+            panorama: basePath + '0006.jpg', // ¡Asegúrate de tener cocina.jpg en la carpeta assets!
             zoom: 50,
             fov: 70,
             markers: [
