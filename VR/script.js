@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
             markers: [
                 {
                     id: 'marker-hall',
-                    position: { yaw: Math.PI / 2, pitch: 0 }, // Ajusta con el truco del clic
+                    position: { yaw: 0, pitch: 0 }, // Ajusta con el truco del clic
                     html: '<div style="background: red; color: white; padding: 15px 25px; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); white-space: nowrap;">IR AL COMEDOR →</div>',
                     tooltip: 'Haz clic para entrar',
                     targetScene: 'hall' // A dónde lleva este botón
@@ -26,14 +26,14 @@ document.addEventListener('DOMContentLoaded', () => {
             markers: [
                 {
                     id: 'marker-comedor',
-                    position: { yaw: -Math.PI / 2, pitch: 0 },
+                    position: { yaw: 0, pitch: 0 },
                     html: '<div style="background: blue; color: white; padding: 15px 25px; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); white-space: nowrap;">← VOLVER AL HALL</div>',
                     tooltip: 'Haz clic para volver al hall',
                     targetScene: 'comedor'
                 },
                 {
                     id: 'marker-pasillo',
-                    position: { yaw: -Math.PI / 2, pitch: 0 },
+                    position: { yaw: Math.PI / 2, pitch: 0 },
                     html: '<div style="background: green; color: white; padding: 15px 25px; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); white-space: nowrap;">IR A LA COCINA →</div>',
                     tooltip: 'Haz clic para ir a la cocina',
                     targetScene: 'pasillo'
