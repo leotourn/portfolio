@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const scenes = {
         acceso: {
             panorama: basePath + '0001.jpg',
+            mapX: '32%',  // ← AGREGAR: posición horizontal en el plano
+            mapY: '98%',  // ← AGREGAR: posición vertical en el plano
             zoom: 0,
             fov: 100,
             markers: [
@@ -21,6 +23,8 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         hall: {
             panorama: basePath + '0002.jpg',
+            mapX: '30%',  // ← AGREGAR: posición horizontal en el plano
+            mapY: '52%',  // ← AGREGAR: posición vertical en el plano
             zoom: 0,
             fov: 100,
             markers: [
@@ -49,6 +53,8 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         comedor: {
             panorama: basePath + '0003.jpg',
+            mapX: '14%',  // ← AGREGAR: posición horizontal en el plano
+            mapY: '52%',  // ← AGREGAR: posición vertical en el plano
             zoom: 0,
             fov: 100,
             markers: [
@@ -70,6 +76,8 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         cocina: {
             panorama: basePath + '0004.jpg',
+            mapX: '14%',  // ← AGREGAR: posición horizontal en el plano
+            mapY: '82%',  // ← AGREGAR: posición vertical en el plano
             zoom: 0,
             fov: 70,
             markers: [
@@ -84,6 +92,8 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         pasillo: {
             panorama: basePath + '0005.jpg',
+            mapX: '50%',  // ← AGREGAR: posición horizontal en el plano
+            mapY: '58%',  // ← AGREGAR: posición vertical en el plano
             zoom: 0,
             fov: 70,
             markers: [
@@ -105,6 +115,8 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         dormitorio: {
             panorama: basePath + '0006.jpg',
+            mapX: '90%',  // ← AGREGAR: posición horizontal en el plano
+            mapY: '58%',  // ← AGREGAR: posición vertical en el plano
             zoom: 0,
             fov: 70,
             markers: [
@@ -163,7 +175,22 @@ document.addEventListener('DOMContentLoaded', () => {
             zoom: scene.zoom,
             duration: 1500 // 1.5 segundos (4500 era un poco lento para la navegación)
         });
+        // AGREGAR ESTA LÍNEA: Actualizar la posición del punto
+        updatePlayerDot(sceneId);
     }
+
+    // 5. punto rojo
+    function updatePlayerDot(sceneId) {
+        const scene = scenes[sceneId];
+        if (!scene || !scene.mapX || !scene.mapY) return;
+        const dot = document.getElementById('player-dot');
+        if (dot) {
+            dot.style.top = scene.mapY;
+            dot.style.left = scene.mapX;
+        }
+    }
+
+
 
     // 5. Evento: Al hacer clic en un botón/marker
     markersPlugin.addEventListener('select-marker', (e) => {
@@ -178,5 +205,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // 6. Iniciar el tour
     viewer.addEventListener('ready', () => {
         loadScene('acceso');
+        updatePlayerDot('acceso');
     });
 });

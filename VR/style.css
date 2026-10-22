@@ -4,8 +4,83 @@ body, html {
     width: 100%;
     height: 100%;
     overflow: hidden;
+    background: #1a1a1a;
 }
+
 #viewer {
     width: 100vw;
     height: 100vh;
+}
+
+.vr-button {
+    /* 1. TIPOGRAFÍA Y TEXTO */
+    font-family: 'Montserrat', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-size: 8px;           /* Tamaño legible en 3D */
+    font-weight: 700;          /* 700 es negrita, 600 es semi-negrita, 400 es normal */
+    text-transform: uppercase; /* Convierte automáticamente "entrar" a "ENTRAR" */
+    letter-spacing: 1.5px;     /* Espacio entre letras (da un look premium y limpio) */
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6); /* Sombra al texto para que se lea sobre cualquier fondo */
+    color: #ffffff;            /* Color del texto */
+
+    /* 2. FORMA Y FONDO DEL BOTÓN */
+    background: rgba(30, 30, 30, 0.25); /* Fondo oscuro semitransparente */
+    backdrop-filter: blur(6px);         /* Efecto "vidrio esmerilado" detrás del botón (muy moderno) */
+    padding: 6px 12px;
+    border-radius: 5px;                /* Bordes completamente redondeados (tipo píldora) */
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Borde sutil blanco */
+
+    /* 3. COMPORTAMIENTO */
+    cursor: pointer;
+    white-space: nowrap;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* Animación ultra suave */
+}
+
+/* Efecto cuando el usuario pasa el mouse por encima (o toca en móvil) */
+.vr-button:hover {
+    background: rgba(255, 255, 255, 0.9); /* El fondo se vuelve blanco */
+    color: #1a1a1a;                        /* El texto se vuelve oscuro */
+    text-shadow: none;                     /* Quitamos la sombra del texto para que se vea nítido */
+    transform: translateY(-2px) scale(1.05); /* Se eleva y crece un poco */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+    border-color: rgba(255, 255, 255, 0.8);
+}
+
+/* --- ESTILO DEL MINI-MAPA (HUD) --- */
+#minimap-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 200px;
+    height: 110px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    pointer-events: none;
+}
+
+#minimap-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: 0.8;
+}
+
+#player-dot {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: #fd9a4d;
+    border: 2px solid rgba(255, 255, 255, 0.96);
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    transform: translate(-50%, -50%);
+    transition: top 0.6s cubic-bezier(0.25, 0.8, 0.25, 1),
+                left 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+    z-index: 1001;
 }
