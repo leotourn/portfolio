@@ -52,9 +52,9 @@ body, html {
     position: absolute;
     top: 20px;
     right: 20px;
-    width: 200px;
-    height: 110px;
-    border-radius: 12px;
+    width: 100px;
+    height: 60px;
+    border-radius: 4px;
     overflow: hidden;
     border: 2px solid rgba(255, 255, 255, 0.2);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
