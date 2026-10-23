@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
             panorama: basePath + '0001.jpg',
             mapX: '32%',  // ← AGREGAR: posición horizontal en el plano
             mapY: '98%',  // ← AGREGAR: posición vertical en el plano
-            zoom: 0,
+            zoom: 50,
             fov: 100,
             markers: [
                 {
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
             panorama: basePath + '0002.jpg',
             mapX: '30%',  // ← AGREGAR: posición horizontal en el plano
             mapY: '52%',  // ← AGREGAR: posición vertical en el plano
-            zoom: 0,
+            zoom: 50,
             fov: 100,
             markers: [
                 {
@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
             panorama: basePath + '0003.jpg',
             mapX: '14%',  // ← AGREGAR: posición horizontal en el plano
             mapY: '52%',  // ← AGREGAR: posición vertical en el plano
-            zoom: 0,
+            zoom: 50,
             fov: 100,
             markers: [
                 {
@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
             panorama: basePath + '0004.jpg',
             mapX: '14%',  // ← AGREGAR: posición horizontal en el plano
             mapY: '82%',  // ← AGREGAR: posición vertical en el plano
-            zoom: 0,
+            zoom: 50,
             fov: 70,
             markers: [
                 {
@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
             panorama: basePath + '0005.jpg',
             mapX: '50%',  // ← AGREGAR: posición horizontal en el plano
             mapY: '58%',  // ← AGREGAR: posición vertical en el plano
-            zoom: 0,
+            zoom: 50,
             fov: 70,
             markers: [
                 {
@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
             panorama: basePath + '0006.jpg',
             mapX: '90%',  // ← AGREGAR: posición horizontal en el plano
             mapY: '58%',  // ← AGREGAR: posición vertical en el plano
-            zoom: 0,
+            zoom: 50,
             fov: 70,
             markers: [
                 {
