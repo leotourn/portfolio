@@ -137,7 +137,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const viewer = new PhotoSphereViewer.Viewer({
         container: document.querySelector('#viewer'),
         panorama: scenes[currentSceneId].panorama,
-        navbar: ['zoom', 'move', 'fullscreen'],
+        navbar: [
+            'zoom',
+            //'move',
+            //'fullscreen',
+            'caption'
+        ],
         loadingImg: 'https://photo-sphere-viewer.js.org/assets/loader.gif',
         defaultZoomLvl: 0,
         minFov: 30,
