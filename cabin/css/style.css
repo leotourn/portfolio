@@ -7,9 +7,59 @@ body {
     width: 100vw;
     height: 100vh; /*el visor SIEMPRE necesita un tamaño definido */
 }
-.psv-container {
-    --psv-navbar-background: rgba(20, 20, 30, 0.85);
+
+/* Barra */
+.psv-container .psv-navbar {
+    background: rgba(20, 20, 30, 0.2);
+    border-radius: 10px;
+    margin: 0 auto 12px;     /* flotante, separada del borde */
+    width: fit-content;
+    left: 0; right: 0;
+    bottom: 0;
+}
+
+/* Botones */
+.psv-container .psv-button {
+    color: #fff;
+}
+.psv-container .psv-button:hover {
+    background: rgba(255, 255, 255, 0.15);
 }
 .btn-inicio {
-    font-size: 20px;
+    font-size: 15px;
+}
+
+/* Texto del caption */
+.psv-container .psv-caption #{
+    color: rgba(255, 255, 255, 0.6);
+    font: 600 16px system-ui, sans-serif;
+}
+
+#menu {
+    position: fixed;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;   /* por encima del visor */
+    display: flex;
+    gap: 6px;
+    padding: 6px;
+    background: rgba(20, 20, 30, 0.2);
+    border-radius: 10px;
+    backdrop-filter: blur(6px);
+    max-width: 95vw;
+    overflow-x: auto;   /* si hay muchas habitaciones, se desliza en el celu */
+}
+#menu button {
+    border: 0;
+    padding: 8px 14px;
+    border-radius: 10px;
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+    white-space: nowrap;
+}
+#menu button.activo {
+    background: rgba(255, 255, 255, 0.6);
+    color: #222;
 }
