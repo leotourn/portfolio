@@ -1,8 +1,15 @@
-html, body {
+html,
+body {
     margin: 0;
     height: 100%;
 }
 #viewer {
     width: 100vw;
     height: 100vh; /*el visor SIEMPRE necesita un tamaño definido */
+}
+.psv-container {
+    --psv-navbar-background: rgba(20, 20, 30, 0.85);
+}
+.btn-inicio {
+    font-size: 20px;
 }
