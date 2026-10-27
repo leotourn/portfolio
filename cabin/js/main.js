@@ -26,7 +26,7 @@ const viewer = new Viewer({
             {
                 positionMode: "manual", // nosotros decidimos dónde va cada flecha
                 renderMode: "3d", // flechas pegadas al piso
-                startNodeId: "pasillo",
+                startNodeId: "acceso",
                 nodes: [
                     {
                         id: "acceso",
