@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viweport" content="width=device-width, initial-scale=1.0">
+        <title>Recorrido virtual</title>
+
+        <!-- Estilos de la libreria -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core@5.13.2/index.min.css">
+        <!-- Mis estilos -->
+        <link rel="stylesheet" href="css/style.css">
+
+        <!-- Import map: le dice al navegador donde está cada librería -->
+        <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three/build/three.module.js",
+                "@photo-sphere-viewer/core": "https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core@5.13.2/index.module.js"
+            }
+        }
+        </script>
+    </head>
+    <body>
+        <div id="viewer"></div>
+        <script type="module" src="js/main.js"></script>
+    </body>
+</html>
