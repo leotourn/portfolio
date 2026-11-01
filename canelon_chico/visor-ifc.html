@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Visor IFC · Vivienda</title>
+<style>
+  :root{
+    --bg:#eef0f1; --panel:#ffffff; --ink:#1f2a30; --muted:#66757d; --line:#d3d9dc;
+    --accent:#1d6f7a; --accent-ink:#ffffff; --warn:#a4452c;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#14191c; --panel:#1d2428; --ink:#e4eaed; --muted:#8fa0a8; --line:#313c42;
+           --accent:#4fb3bf; --accent-ink:#0d1a1d; --warn:#e08a70; }
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink);
+       display:grid;grid-template-columns:300px 1fr 300px;grid-template-rows:100%;overflow:hidden}
+  aside{background:var(--panel);overflow:auto;padding:16px;display:flex;flex-direction:column;gap:16px}
+  #left{border-right:1px solid var(--line)} #right{border-left:1px solid var(--line)}
+  h1{font-size:16px;margin:0} h2{font-size:13px;margin:0 0 8px;font-weight:600}
+  p.hint{color:var(--muted);margin:0;font-size:12.5px}
+  #viewer{position:relative;min-width:0}
+  #viewport{position:absolute;inset:0}
+  button,.btn{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);
+       padding:7px 12px;border-radius:6px;cursor:pointer}
+  button:hover,.btn:hover{border-color:var(--accent)}
+  button.primary,.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .layer{border:1px solid var(--line);border-radius:6px;padding:10px;display:grid;gap:8px}
+  .layer header{display:flex;align-items:center;gap:8px;justify-content:space-between}
+  .layer label{display:flex;align-items:center;gap:8px;font-weight:600;min-width:0}
+  .layer .name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .layer .row{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12.5px}
+  .layer input[type=range]{flex:1;accent-color:var(--accent)}
+  .swatch{width:10px;height:10px;border-radius:2px;flex:none}
+  #status{position:absolute;left:12px;bottom:12px;background:var(--panel);border:1px solid var(--line);
+       border-radius:6px;padding:6px 10px;font-size:12.5px;max-width:70%}
+  #status.error{color:var(--warn);border-color:var(--warn)}
+  #drop{position:absolute;inset:12px;border:2px dashed var(--accent);border-radius:10px;display:none;
+       align-items:center;justify-content:center;background:color-mix(in srgb,var(--panel) 80%,transparent);
+       font-weight:600;pointer-events:none}
+  #drop.on{display:flex}
+  table{border-collapse:collapse;width:100%;font-size:12.5px}
+  td{border-top:1px solid var(--line);padding:5px 4px;vertical-align:top;word-break:break-word}
+  td:first-child{color:var(--muted);width:42%}
+  .tools{display:flex;gap:6px;flex-wrap:wrap}
+  @media (max-width:900px){
+    body{grid-template-columns:1fr;grid-template-rows:auto 60vh auto;overflow:auto}
+    #left{border-right:0} #right{border-left:0}
+  }
+</style>
+</head>
+<body>
+
+<aside id="left">
+  <div>
+    <h1>Visor IFC · Vivienda</h1>
+    <p class="hint">Cargá los modelos y activá o desactivá cada capa.</p>
+  </div>
+
+  <div>
+    <h2>Cargar modelo</h2>
+    <label class="btn primary" for="file">Elegir archivos .ifc</label>
+    <input id="file" type="file" accept=".ifc" multiple hidden>
+    <p class="hint" style="margin-top:8px">También podés arrastrar los archivos sobre el visor. Se procesan en tu navegador; no se suben a ningún servidor.</p>
+  </div>
+
+  <div>
+    <h2>Capas</h2>
+    <div id="layers"><p class="hint">Todavía no hay modelos cargados.</p></div>
+  </div>
+
+  <div>
+    <h2>Vista</h2>
+    <div class="tools">
+      <button id="fit">Encuadrar todo</button>
+      <button id="clear">Quitar selección</button>
+    </div>
+  </div>
+</aside>
+
+<main id="viewer">
+  <div id="viewport"></div>
+  <div id="drop">Soltá los archivos IFC acá</div>
+  <div id="status">Iniciando visor…</div>
+</main>
+
+<aside id="right">
+  <div>
+    <h2>Elemento seleccionado</h2>
+    <div id="props"><p class="hint">Hacé clic sobre un elemento del modelo para ver sus propiedades.</p></div>
+  </div>
+</aside>
+
+<script type="module">
+/* ------------------------------------------------------------------
+   CONFIGURACIÓN
+   Si subís los IFC al repositorio, listalos acá y se cargan solos.
+   Ejemplo: { name:"Arquitectura", url:"models/arquitectura.ifc", color:"#c9a66b" }
+------------------------------------------------------------------- */
+const AUTO_MODELS = [
+  { name: "Arquitectura", url: "models/TZ-CANELON-CHICO.ifc" },
+  { name: "Estructura steel framing", url: "models/TZ-CANELON-CHICO-ES.ifc" },
+];
+const VERSIONS = { components: "2.4.11", three: "0.160.1", webifc: "0.0.66" };
+const PALETTE = ["#c9a66b", "#3f7f9b", "#8a9a5b", "#b0614a"];
+
+const $ = (id) => document.getElementById(id);
+const status = (msg, err=false) => { const s=$("status"); s.textContent=msg; s.className=err?"error":""; s.style.display=msg?"block":"none"; };
+
+let OBC, THREE;
+try {
+  [OBC, THREE] = await Promise.all([
+    import(`https://esm.sh/@thatopen/components@${VERSIONS.components}?deps=three@${VERSIONS.three}`),
+    import(`https://esm.sh/three@${VERSIONS.three}`),
+  ]);
+} catch (e) {
+  console.error(e);
+  status("No se pudieron descargar las librerías. Revisá tu conexión y recargá.", true);
+  throw e;
+}
+
+/* ---------- Mundo 3D ---------- */
+const components = new OBC.Components();
+const world = components.get(OBC.Worlds).create();
+world.scene = new OBC.SimpleScene(components);
+world.renderer = new OBC.SimpleRenderer(components, $("viewport"));
+world.camera = new OBC.SimpleCamera(components);
+components.init();
+world.scene.setup();
+world.scene.three.background = null;
+world.camera.controls.setLookAt(14, 10, 14, 0, 2, 0);
+components.get(OBC.Grids).create(world);
+
+const ifcLoader = components.get(OBC.IfcLoader);
+await ifcLoader.setup({
+  autoSetWasm: false,
+  wasm: { path: `https://unpkg.com/web-ifc@${VERSIONS.webifc}/`, absolute: true },
+});
+
+const raycaster = components.get(OBC.Raycasters).get(world);
+
+/* ---------- Capas ---------- */
+const layers = []; // { id, name, model, color, visible, opacity }
+
+function setOpacity(model, value){
+  model.traverse((o) => {
+    if (!o.material) return;
+    (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) => {
+      m.transparent = value < 1; m.opacity = value; m.depthWrite = value >= 1; m.needsUpdate = true;
+    });
+  });
+}
+
+function renderLayers(){
+  const box = $("layers");
+  if (!layers.length){ box.innerHTML = '<p class="hint">Todavía no hay modelos cargados.</p>'; return; }
+  box.innerHTML = "";
+  box.style.display = "grid"; box.style.gap = "8px";
+  layers.forEach((L) => {
+    const el = document.createElement("div");
+    el.className = "layer";
+    el.innerHTML = `
+      <header>
+        <label><input type="checkbox" ${L.visible ? "checked" : ""} aria-label="Mostrar ${L.name}">
+          <span class="swatch" style="background:${L.color}"></span><span class="name" title="${L.name}">${L.name}</span></label>
+        <button data-act="remove" aria-label="Quitar ${L.name}">Quitar</button>
+      </header>
+      <div class="row"><span>Opacidad</span>
+        <input type="range" min="10" max="100" value="${Math.round(L.opacity*100)}" aria-label="Opacidad de ${L.name}">
+      </div>`;
+    el.querySelector('input[type=checkbox]').onchange = (e) => { L.visible = e.target.checked; L.model.visible = L.visible; };
+    el.querySelector('input[type=range]').oninput = (e) => { L.opacity = e.target.value/100; setOpacity(L.model, L.opacity); };
+    el.querySelector('[data-act=remove]').onclick = () => removeLayer(L);
+    box.appendChild(el);
+  });
+}
+
+function removeLayer(L){
+  world.scene.three.remove(L.model);
+  try { L.model.dispose(); } catch(_) {}
+  layers.splice(layers.indexOf(L), 1);
+  clearSelection(); renderLayers();
+}
+
+async function addModel(buffer, name){
+  status(`Procesando "${name}"…`);
+  try {
+    const model = await ifcLoader.load(new Uint8Array(buffer), false, name);
+    world.scene.three.add(model);
+    const color = PALETTE[layers.length % PALETTE.length];
+    layers.push({ id: model.uuid, name, model, color, visible: true, opacity: 1 });
+    renderLayers(); fitAll();
+    status(`"${name}" cargado.`); setTimeout(() => status(""), 2500);
+  } catch (e) {
+    console.error(e);
+    status(`No se pudo leer "${name}". Probá con otro IFC (ver consola para el detalle).`, true);
+  }
+}
+
+async function addFiles(files){
+  for (const f of files){
+    if (!/\.ifc$/i.test(f.name)) { status(`"${f.name}" no es un archivo .ifc`, true); continue; }
+    await addModel(await f.arrayBuffer(), f.name.replace(/\.ifc$/i, ""));
+  }
+}
+
+function fitAll(){
+  const box = new THREE.Box3();
+  layers.filter(l => l.visible).forEach(l => box.expandByObject(l.model));
+  if (box.isEmpty()) return;
+  world.camera.controls.fitToBox(box, true, { paddingTop:.5, paddingBottom:.5, paddingLeft:.5, paddingRight:.5 });
+}
+
+/* ---------- Selección y propiedades ---------- */
+let selected = null; // { fragment, id }
+
+function clearSelection(){
+  if (selected){ try { selected.fragment.resetColor([String(selected.id)]); } catch(_) {} }
+  selected = null;
+  $("props").innerHTML = '<p class="hint">Hacé clic sobre un elemento del modelo para ver sus propiedades.</p>';
+}
+
+const val = (v) => (v && typeof v === "object" && "value" in v) ? v.value : v;
+
+async function showProps(model, expressID){
+  const box = $("props");
+  let data = null;
+  try { data = await model.getProperties(expressID); } catch(_) {}
+  if (!data){ box.innerHTML = `<p class="hint">ID ${expressID} (sin propiedades disponibles).</p>`; return; }
+  const rows = [["Capa", layers.find(l => l.model === model)?.name ?? "—"],
+                ["Nombre", val(data.Name)], ["Tipo IFC", data.constructor?.name && data.type ? `IFC type ${data.type}` : "—"],
+                ["Descripción", val(data.Description)], ["GlobalId", val(data.GlobalId)], ["ID Express", expressID]]
+    .filter(([, v]) => v !== undefined && v !== null && v !== "");
+  box.innerHTML = "<table>" + rows.map(([k, v]) => `<tr><td>${k}</td><td>${String(v).replace(/</g,"&lt;")}</td></tr>`).join("") + "</table>";
+}
+
+$("viewport").addEventListener("click", async () => {
+  const hit = await raycaster.castRay();
+  if (!hit || !hit.object) { clearSelection(); return; }
+  const fragment = hit.object.fragment, inst = hit.instanceId;
+  if (!fragment || inst === undefined) return;
+  clearSelection();
+  const id = Number(fragment.getItemID(inst));
+  selected = { fragment, id };
+  try { fragment.setColor(new THREE.Color("#e8a317"), [String(id)], true); } catch(_) {}
+  const model = layers.map(l => l.model).find(m => m.items?.includes(fragment));
+  if (model) showProps(model, id);
+});
+
+/* ---------- Controles ---------- */
+$("file").onchange = (e) => { addFiles(e.target.files); e.target.value = ""; };
+$("fit").onclick = fitAll;
+$("clear").onclick = clearSelection;
+
+const drop = $("drop");
+["dragenter","dragover"].forEach(t => $("viewer").addEventListener(t, (e) => { e.preventDefault(); drop.classList.add("on"); }));
+["dragleave","drop"].forEach(t => $("viewer").addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove("on"); }));
+$("viewer").addEventListener("drop", (e) => addFiles(e.dataTransfer.files));
+
+/* ---------- Carga automática (opcional) ---------- */
+status("Visor listo. Cargá un IFC para empezar.");
+for (const m of AUTO_MODELS){
+  try {
+    const r = await fetch(m.url); if (!r.ok) throw new Error(r.status);
+    await addModel(await r.arrayBuffer(), m.name);
+  } catch (e) { status(`No se pudo cargar ${m.url}`, true); }
+}
+</script>
+</body>
+</html>
