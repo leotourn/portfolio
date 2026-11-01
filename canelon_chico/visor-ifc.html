@@ -95,14 +95,9 @@
 </aside>
 
 <script type="module">
-/* ------------------------------------------------------------------
-   CONFIGURACIÓN
-   Si subís los IFC al repositorio, listalos acá y se cargan solos.
-   Ejemplo: { name:"Arquitectura", url:"models/arquitectura.ifc", color:"#c9a66b" }
-------------------------------------------------------------------- */
 const AUTO_MODELS = [
   { name: "Arquitectura", url: "models/TZ-CANELON-CHICO.ifc" },
-  { name: "Estructura steel framing", url: "models/TZ-CANELON-CHICO-ES.ifc" },
+  { name: "Estructura", url: "models/TZ-CANELON-CHICO-ES.ifc" },
 ];
 const VERSIONS = { components: "2.4.11", three: "0.175.0", webifc: "0.0.66" };
 const PALETTE = ["#c9a66b", "#3f7f9b", "#8a9a5b", "#b0614a"];
@@ -113,7 +108,7 @@ const status = (msg, err=false) => { const s=$("status"); s.textContent=msg; s.c
 let OBC, THREE;
 try {
   [OBC, THREE] = await Promise.all([
-    import(`https://esm.sh/@thatopen/components@${VERSIONS.components}?deps=three@${VERSIONS.three}`),
+    import(`https://esm.sh/@thatopen/components@${VERSIONS.components}?deps=three@${VERSIONS.three},web-ifc@${VERSIONS.webifc}`),
     import(`https://esm.sh/three@${VERSIONS.three}`),
   ]);
 } catch (e) {
@@ -122,7 +117,6 @@ try {
   throw e;
 }
 
-/* ---------- Mundo 3D ---------- */
 const components = new OBC.Components();
 const world = components.get(OBC.Worlds).create();
 world.scene = new OBC.SimpleScene(components);
@@ -142,8 +136,7 @@ await ifcLoader.setup({
 
 const raycaster = components.get(OBC.Raycasters).get(world);
 
-/* ---------- Capas ---------- */
-const layers = []; // { id, name, model, color, visible, opacity }
+const layers = [];
 
 function setOpacity(model, value){
   model.traverse((o) => {
@@ -196,7 +189,7 @@ async function addModel(buffer, name){
     status(`"${name}" cargado.`); setTimeout(() => status(""), 2500);
   } catch (e) {
     console.error(e);
-    status(`No se pudo leer "${name}". Probá con otro IFC (ver consola para el detalle).`, true);
+    status(`No se pudo leer "${name}": ${e?.message || e}`, true);
   }
 }
 
@@ -214,8 +207,7 @@ function fitAll(){
   world.camera.controls.fitToBox(box, true, { paddingTop:.5, paddingBottom:.5, paddingLeft:.5, paddingRight:.5 });
 }
 
-/* ---------- Selección y propiedades ---------- */
-let selected = null; // { fragment, id }
+let selected = null;
 
 function clearSelection(){
   if (selected){ try { selected.fragment.resetColor([String(selected.id)]); } catch(_) {} }
@@ -250,7 +242,6 @@ $("viewport").addEventListener("click", async () => {
   if (model) showProps(model, id);
 });
 
-/* ---------- Controles ---------- */
 $("file").onchange = (e) => { addFiles(e.target.files); e.target.value = ""; };
 $("fit").onclick = fitAll;
 $("clear").onclick = clearSelection;
@@ -260,7 +251,6 @@ const drop = $("drop");
 ["dragleave","drop"].forEach(t => $("viewer").addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove("on"); }));
 $("viewer").addEventListener("drop", (e) => addFiles(e.dataTransfer.files));
 
-/* ---------- Carga automática (opcional) ---------- */
 status("Visor listo. Cargá un IFC para empezar.");
 for (const m of AUTO_MODELS){
   try {
