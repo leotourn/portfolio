@@ -78,14 +78,14 @@ body {
 }
 #menu button {
     border: 0;
-    padding: 10px 14px;
+    padding: 4px 14px;
     border-radius: 8px;
     background: transparent;
     color: #fff;
     cursor: pointer;
     text-align: left;
     white-space: nowrap;
-    font: 500 15px system-ui, sans-serif;
+    font: 500 14px system-ui, sans-serif;
 }
 #menu button:hover {
     background: rgba(255, 255, 255, 0.15);
