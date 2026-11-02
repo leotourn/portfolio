@@ -142,6 +142,12 @@ const viewer = new Viewer({
 
 viewer.container.appendChild(menu);
 
+// Evita que el visor capture los toques sobre la lista de habitaciones
+["pointerdown", "pointermove", "pointerup", "touchstart", "touchmove", "touchend", "mousedown", "wheel"]
+    .forEach((evento) => {
+        menu.addEventListener(evento, (e) => e.stopPropagation(), { passive: true });
+    });
+
 const tour = viewer.getPlugin(VirtualTourPlugin);
 const botones = document.querySelectorAll("#menu button");
 
@@ -160,7 +166,7 @@ tour.addEventListener("node-changed", ({ node }) => {
 });
 
 // Clic fuera: cierra el desplegable
-document.addEventListener("click", (e) => {
+document.addEventListener("pointerdown", (e) => {
     if (!menu.contains(e.target) && !e.target.closest(".btn-ubicaciones")) {
         menu.classList.remove("abierto");
     }

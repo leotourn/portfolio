@@ -72,6 +72,7 @@ body {
     background: rgba(20, 20, 30, 0.75);
     border-radius: 10px;
     backdrop-filter: blur(6px);
+    touch-action: pan-y;   /* permite deslizar la lista hacia arriba y abajo con el dedo */
 }
 #menu.abierto {
     display: flex;
@@ -87,6 +88,12 @@ body {
     white-space: nowrap;
     font: 500 14px system-ui, sans-serif;
 }
+
+#menu,
+#menu button {
+    touch-action: manipulation;
+}
+
 #menu button:hover {
     background: rgba(255, 255, 255, 0.15);
 }
