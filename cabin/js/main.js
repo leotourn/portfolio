@@ -1,6 +1,7 @@
 import { Viewer } from "@photo-sphere-viewer/core";
 import { MarkersPlugin } from "@photo-sphere-viewer/markers-plugin";
 import { VirtualTourPlugin } from "@photo-sphere-viewer/virtual-tour-plugin";
+import { GyroscopePlugin } from "@photo-sphere-viewer/gyroscope-plugin";
 
 const menu = document.querySelector("#menu");
 
@@ -33,10 +34,16 @@ const viewer = new Viewer({
     container: document.querySelector("#viewer"),
     defaultZoomLvl: 10,
     navbar: esMovil
-        ? [botonInicio, botonUbicaciones, "fullscreen"]
-        : ["zoom", botonInicio, botonUbicaciones, "fullscreen"],
+        ? [botonInicio, botonUbicaciones, "gyroscope", "fullscreen"]
+        : ["zoom", botonInicio, botonUbicaciones, "gyroscope", "fullscreen"],
     plugins: [
         MarkersPlugin,
+        [GyroscopePlugin, {
+            touchmove: true,          // permite arrastrar con el dedo mientras el giroscopio está activo
+            roll: true,               // aplica la inclinación lateral del teléfono
+            absolutePosition: false,  // false: parte desde donde estás mirando; true: usa la orientación real del aparato
+            moveMode: "smooth",       // "smooth" suaviza el movimiento; "fast" responde al instante
+        }],
         [
             VirtualTourPlugin,
             {
