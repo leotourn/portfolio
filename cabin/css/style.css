@@ -27,39 +27,73 @@ body {
 }
 .btn-inicio {
     font-size: 15px;
+    width: 20px;
+    height: 20px;
 }
 
 /* Texto del caption */
-.psv-container .psv-caption #{
-    color: rgba(255, 255, 255, 0.6);
-    font: 600 16px system-ui, sans-serif;
+.psv-container .psv-caption {
+  color: #fff;
+  font: 600 16px system-ui, sans-serif;
 }
 
+/* Botón de ubicaciones en la barra (texto en lugar de ícono) */
+.psv-container .psv-button.btn-ubicaciones {
+    width: auto;
+    padding: 8px 4px;
+    font: 600 16px system-ui, sans-serif;
+    color: #fff;
+    white-space: nowrap;
+}
+
+/* Desplegable de habitaciones */
 #menu {
-    position: fixed;
-    top: 12px;
+    position: absolute;      /* ahora vive dentro del visor */
+    bottom: 64px;            /* justo sobre la barra inferior */
     left: 50%;
     transform: translateX(-50%);
-    z-index: 100;   /* por encima del visor */
-    display: flex;
-    gap: 6px;
+    z-index: 1000;
+    display: none;           /* oculto hasta que se abre */
+    flex-direction: column;
+    gap: 2px;
     padding: 6px;
-    background: rgba(20, 20, 30, 0.2);
+    min-width: 180px;
+    max-height: 60vh;
+    overflow-y: auto;        /* si hay muchas habitaciones, se desliza */
+    background: rgba(20, 20, 30, 0.75);
     border-radius: 10px;
     backdrop-filter: blur(6px);
-    max-width: 95vw;
-    overflow-x: auto;   /* si hay muchas habitaciones, se desliza en el celu */
+}
+#menu.abierto {
+    display: flex;
 }
 #menu button {
     border: 0;
-    padding: 8px 14px;
-    border-radius: 10px;
+    padding: 10px 14px;
+    border-radius: 8px;
     background: transparent;
     color: #fff;
     cursor: pointer;
+    text-align: left;
     white-space: nowrap;
+    font: 500 15px system-ui, sans-serif;
+}
+#menu button:hover {
+    background: rgba(255, 255, 255, 0.15);
 }
 #menu button.activo {
     background: rgba(255, 255, 255, 0.6);
     color: #222;
+}
+
+/* Markers */
+.mi-marker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #ffd166;
+    color: #222;
+    font: 700 18px system-ui, sans-serif;
+    cursor: pointer;
 }

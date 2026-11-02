@@ -2,12 +2,18 @@ import { Viewer } from "@photo-sphere-viewer/core";
 import { MarkersPlugin } from "@photo-sphere-viewer/markers-plugin";
 import { VirtualTourPlugin } from "@photo-sphere-viewer/virtual-tour-plugin";
 
+const menu = document.querySelector("#menu");
+
+// Texto del botón que reemplaza al caption
+const etiqueta = document.createElement("span");
+etiqueta.textContent = "Ubicaciones ▾";
+
 const viewer = new Viewer({
     container: document.querySelector("#viewer"),
     defaultZoomLvl: 10,
     navbar: [
         "zoom",
-    /*  {
+        {
             id: "btn-inicio",
             title: "Ir al inicio",
             content: '<img src="img/icons/home.svg" width="20" height="20" alt="">',
@@ -16,8 +22,15 @@ const viewer = new Viewer({
                 viewer.getPlugin(VirtualTourPlugin).setCurrentNode("acceso");
             }
         },
-        "caption",
-        */
+        "markers",
+        "markersList",
+        {
+            id: "btn-ubicaciones",
+            title: "Ir a otra habitación",
+            content: etiqueta,
+            className: "btn-ubicaciones",
+            onClick: () => menu.classList.toggle("abierto"),
+        },
         "fullscreen",
     ],
     plugins: [
@@ -26,8 +39,12 @@ const viewer = new Viewer({
             VirtualTourPlugin,
             {
                 positionMode: "manual", // nosotros decidimos dónde va cada flecha
-                renderMode: "3d", // flechas pegadas al piso
+                renderMode: "2d", // flechas pegadas al piso
                 startNodeId: "acceso",
+                arrowStyle: {
+                    image: "img/icons/disco.png",
+                    size: { width: 50, height: 30 },
+                },
                 nodes: [
                     {
                         id: "acceso",
@@ -46,7 +63,7 @@ const viewer = new Viewer({
                             { nodeId: "comedor", position: { yaw: "0deg", pitch: "0deg" }},
                             { nodeId: "living", position: { yaw: "55deg", pitch: "0deg" }},
                             { nodeId: "escalera", position: { yaw: "95deg", pitch: "0deg" }}
-                            ]
+                        ]
                     },
                     {
                         id: "comedor",
@@ -63,7 +80,8 @@ const viewer = new Viewer({
                         id: "living",
                         panorama: "img/0004.jpg",
                         name: "Living",
-                        links: [{ nodeId: "pasillo", position: { yaw: "330deg", pitch: "0deg" } }]
+                        links: [{ nodeId: "pasillo", position: { yaw: "325deg", pitch: "-20deg" } }],
+                    //    markers: [ { id: "info-tv", position: { yaw: "0deg", pitch: "-5deg" }, html: "i", className: "mi-marker", size: { width: 34, height: 34 }, tooltip: "Televisor", content: '<h3>Televisor</h3><p>Smart TV 50".</p>', hoverScale: true } ],
                     },
                     {
                         id: "cocina",
@@ -119,14 +137,29 @@ const viewer = new Viewer({
         ]
     ]
 });
-const tour = viewer.getPlugin(VirtualTourPlugin);
-const botones = document.querySelectorAll('#menu button');
 
+viewer.container.appendChild(menu);
+
+const tour = viewer.getPlugin(VirtualTourPlugin);
+const botones = document.querySelectorAll("#menu button");
+
+// Al elegir una habitación: ir a ella y cerrar el desplegable
 botones.forEach((btn) => {
-  btn.addEventListener('click', () => tour.setCurrentNode(btn.dataset.nodo));
+    btn.addEventListener("click", () => {
+        tour.setCurrentNode(btn.dataset.nodo);
+        menu.classList.remove("abierto");
+    });
 });
 
-// Resalta el botón de la habitación actual
-tour.addEventListener('node-changed', ({ node }) => {
-  botones.forEach((b) => b.classList.toggle('activo', b.dataset.nodo === node.id));
+// Al cambiar de habitación: actualiza el texto del botón y resalta la actual
+tour.addEventListener("node-changed", ({ node }) => {
+    etiqueta.textContent = `${node.caption || node.name} ▾`;
+    botones.forEach((b) => b.classList.toggle("activo", b.dataset.nodo === node.id));
+});
+
+// Clic fuera: cierra el desplegable
+document.addEventListener("click", (e) => {
+    if (!menu.contains(e.target) && !e.target.closest(".btn-ubicaciones")) {
+        menu.classList.remove("abierto");
+    }
 });
