@@ -2,20 +2,25 @@ html,
 body {
     margin: 0;
     height: 100%;
+    overflow: hidden;      /* evita que la página "rebote" o haga scroll */
 }
 #viewer {
-    width: 100vw;
-    height: 100vh; /*el visor SIEMPRE necesita un tamaño definido */
+    width: 100%;
+    height: 100vh;         /* respaldo para navegadores viejos */
+    height: 100dvh;        /* altura real visible en celulares */
 }
 
 /* Barra */
 .psv-container .psv-navbar {
     background: rgba(20, 20, 30, 0.2);
     border-radius: 10px;
-    margin: 0 auto 12px;     /* flotante, separada del borde */
-    width: fit-content;
-    left: 0; right: 0;
+    width: 460px;                  /* ancho fijo, mayor al que necesitan tus botones */
+    max-width: calc(100% - 24px);  /* en pantallas chicas no se sale */
+    left: 0;
+    right: 0;
     bottom: 0;
+    margin: 0 auto 12px;           /* centrada y separada del borde */
+    justify-content: center;
 }
 
 /* Botones */
@@ -40,10 +45,14 @@ body {
 /* Botón de ubicaciones en la barra (texto en lugar de ícono) */
 .psv-container .psv-button.btn-ubicaciones {
     width: auto;
-    padding: 8px 4px;
-    font: 600 16px system-ui, sans-serif;
+    padding: 0px 12px;
+    font-family: system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 15px;
     color: #fff;
     white-space: nowrap;
+    height: 40px;
+    line-height: 40px; /* centra el texto verticalmente */
 }
 
 /* Desplegable de habitaciones */
@@ -96,4 +105,17 @@ body {
     color: #222;
     font: 700 18px system-ui, sans-serif;
     cursor: pointer;
+}
+
+@media (max-width: 600px) {
+    .psv-container .psv-button.btn-ubicaciones {
+        font-size: 14px;
+        padding: 0 8px;
+    }
+    #menu {
+        min-width: 70vw;     /* lista más cómoda para tocar */
+    }
+    #menu button {
+        padding: 14px 16px;  /* botones más altos para el dedo */
+    }
 }

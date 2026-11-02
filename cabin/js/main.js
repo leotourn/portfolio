@@ -8,42 +8,44 @@ const menu = document.querySelector("#menu");
 const etiqueta = document.createElement("span");
 etiqueta.textContent = "Ubicaciones ▾";
 
+// ¿Celular/tablet o pantalla angosta?
+const esMovil = window.matchMedia("(max-width: 600px), (pointer: coarse)").matches;
+
+const botonInicio = {
+    id: "btn-inicio",
+    title: "Ir al inicio",
+    content: '<img src="img/icons/home.svg" width="20" height="20" alt="">',
+    className: "btn-inicio",
+    onClick: (viewer) => {
+        viewer.getPlugin(VirtualTourPlugin).setCurrentNode("acceso");
+    },
+};
+
+const botonUbicaciones = {
+    id: "btn-ubicaciones",
+    title: "Ir a otra habitación",
+    content: etiqueta,
+    className: "btn-ubicaciones",
+    onClick: () => menu.classList.toggle("abierto"),
+};
+
 const viewer = new Viewer({
     container: document.querySelector("#viewer"),
     defaultZoomLvl: 10,
-    navbar: [
-        "zoom",
-        {
-            id: "btn-inicio",
-            title: "Ir al inicio",
-            content: '<img src="img/icons/home.svg" width="20" height="20" alt="">',
-            className: "btn-inicio",
-            onClick: (viewer) => {
-                viewer.getPlugin(VirtualTourPlugin).setCurrentNode("acceso");
-            }
-        },
-        "markers",
-        "markersList",
-        {
-            id: "btn-ubicaciones",
-            title: "Ir a otra habitación",
-            content: etiqueta,
-            className: "btn-ubicaciones",
-            onClick: () => menu.classList.toggle("abierto"),
-        },
-        "fullscreen",
-    ],
+    navbar: esMovil
+        ? [botonInicio, botonUbicaciones, "fullscreen"]
+        : ["zoom", botonInicio, botonUbicaciones, "fullscreen"],
     plugins: [
-        MarkersPlugin, // el tour lo necesita
+        MarkersPlugin,
         [
             VirtualTourPlugin,
             {
-                positionMode: "manual", // nosotros decidimos dónde va cada flecha
-                renderMode: "2d", // flechas pegadas al piso
+                positionMode: "manual",
+                renderMode: "2d",
                 startNodeId: "acceso",
                 arrowStyle: {
                     image: "img/icons/disco.png",
-                    size: { width: 50, height: 30 },
+                    size: esMovil ? { width: 75, height: 45 } : { width: 50, height: 30 },
                 },
                 nodes: [
                     {
