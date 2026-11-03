@@ -2,6 +2,7 @@ import { Viewer } from "@photo-sphere-viewer/core";
 import { MarkersPlugin } from "@photo-sphere-viewer/markers-plugin";
 import { VirtualTourPlugin } from "@photo-sphere-viewer/virtual-tour-plugin";
 import { GyroscopePlugin } from "@photo-sphere-viewer/gyroscope-plugin";
+import { MapPlugin } from "@photo-sphere-viewer/map-plugin";
 
 const menu = document.querySelector("#menu");
 
@@ -44,12 +45,20 @@ const viewer = new Viewer({
             absolutePosition: false,  // false: parte desde donde estás mirando; true: usa la orientación real del aparato
             moveMode: "smooth",       // "smooth" suaviza el movimiento; "fast" responde al instante
         }],
+        [MapPlugin, {
+            rotation: "0deg",                  // se ajusta en el Paso 4
+            position: "top left",              // arriba, para no chocar con tu navbar inferior
+            size: esMovil ? "140px" : "200px",
+        }],
         [
             VirtualTourPlugin,
             {
                 positionMode: "manual",
                 renderMode: "2d",
                 startNodeId: "acceso",
+                map: {
+                    imageUrl: "img/plano-baja.png",
+                },
                 arrowStyle: {
                     image: "img/icons/disco.png",
                     size: esMovil ? { width: 75, height: 45 } : { width: 50, height: 30 },
@@ -60,6 +69,7 @@ const viewer = new Viewer({
                         panorama: "img/0001.jpg",
                         name: "Entrada",
                         caption:"Entrada",
+                        map: { x: 800, y: 1985 },
                         links: [{ nodeId: "pasillo", position: { yaw: "3deg", pitch: "-3deg" } }]
                     },
                     {
@@ -67,6 +77,7 @@ const viewer = new Viewer({
                         panorama: "img/0002.jpg",
                         name: "Pasillo",
                         caption:"Hall de Distribución",
+                        map: { x: 834, y: 1602 },
                         links: [
                             { nodeId: "acceso", position: { yaw: "180deg", pitch: "0deg" }},
                             { nodeId: "comedor", position: { yaw: "0deg", pitch: "0deg" }},
@@ -79,6 +90,7 @@ const viewer = new Viewer({
                         panorama: "img/0003.jpg",
                         name: "Comedor",
                         caption: "Comedor",
+                        map: { x: 823, y: 981 },
                         links: [
                             { nodeId: "pasillo", position: { yaw: "180deg", pitch: "0deg" } },
                             { nodeId: "cocina", position: { yaw: "270deg", pitch: "0deg" } },
@@ -89,19 +101,24 @@ const viewer = new Viewer({
                         id: "living",
                         panorama: "img/0004.jpg",
                         name: "Living",
+                        caption: "Living",
+                        map: { x: 1154, y: 1343 },
                         links: [{ nodeId: "pasillo", position: { yaw: "325deg", pitch: "-20deg" } }],
-                    //    markers: [ { id: "info-tv", position: { yaw: "0deg", pitch: "-5deg" }, html: "i", className: "mi-marker", size: { width: 34, height: 34 }, tooltip: "Televisor", content: '<h3>Televisor</h3><p>Smart TV 50".</p>', hoverScale: true } ],
-                    },
+                        },
                     {
                         id: "cocina",
                         panorama: "img/0005.jpg",
                         name: "Cocina",
+                        caption: "Cocina",
+                        map: { x: 524, y: 978 },
                         links: [{ nodeId: "comedor", position: { yaw: "270deg", pitch: "0deg" } }]
                     },
                     {
                         id: "escalera",
                         panorama: "img/0006.jpg",
                         name: "Escalera",
+                        caption: "Escalera",
+                        map: { x: 1222, y: 1650 },
                         links: [
                             { nodeId: "pasillo", position: { yaw: "20deg", pitch: "0deg" } },
                             { nodeId: "arriba", position: { yaw: "340deg", pitch: "0deg" } }
@@ -110,7 +127,9 @@ const viewer = new Viewer({
                     {
                         id: "arriba",
                         panorama: "img/0007.jpg",
-                        name: "Segunda Planta",
+                        name: "Planta Alta",
+                        caption: "Planta Alta",
+                        map: { x: 711, y: 1613 },
                         links: [
                             { nodeId: "escalera", position: { yaw: "135deg", pitch: "0deg" } },
                             { nodeId: "dormitorio", position: { yaw: "320deg", pitch: "0deg" } }
@@ -120,6 +139,8 @@ const viewer = new Viewer({
                         id: "dormitorio",
                         panorama: "img/0008.jpg",
                         name: "Cuarto Principal",
+                        caption: "Cuarto Principal",
+                        map: { x: 524, y: 1204 },
                         links: [
                             { nodeId: "arriba", position: { yaw: "320deg", pitch: "0deg" } },
                             { nodeId: "terraza", position: { yaw: "180deg", pitch: "0deg" } }
@@ -129,6 +150,8 @@ const viewer = new Viewer({
                         id: "terraza",
                         panorama: "img/0009.jpg",
                         name: "Terraza",
+                        caption: "Terraza",
+                        map: { x: 575, y: 902 },
                         links: [
                             { nodeId: "dormitorio", position: { yaw: "180deg", pitch: "0deg" } }
                         ]
@@ -137,6 +160,8 @@ const viewer = new Viewer({
                         id: "deck",
                         panorama: "img/0010.jpg",
                         name: "Deck",
+                        caption: "Deck",
+                        map: { x: 840, y: 461 },
                         links: [
                             { nodeId: "comedor", position: { yaw: "180deg", pitch: "0deg" } }
                         ]
