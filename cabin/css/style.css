@@ -126,3 +126,49 @@ body {
         padding: 14px 16px;  /* botones más altos para el dedo */
     }
 }
+
+/* Plano propio */
+#plano {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    width: 240px;
+    z-index: 50;
+    pointer-events: none;   /* no interfiere con arrastrar la vista */
+    filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.6));  /* las líneas se ven sobre cualquier foto */
+}
+#plano-img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+#plano-punto {
+    position: absolute;
+    width: 0;
+    height: 0;
+    transition: left 0.4s ease, top 0.4s ease;   /* el punto se desliza al cambiar de habitación */
+}
+#plano-cono {
+    position: absolute;
+    left: -45px;
+    top: -45px;
+    width: 90px;
+    height: 90px;
+}
+#plano-punto::after {      /* el punto */
+    content: "";
+    position: absolute;
+    left: -6px;
+    top: -6px;
+    width: 12px;
+    height: 12px;
+    box-sizing: border-box;
+    border-radius: 50%;
+    background: #1e78e6;
+    border: 2px solid #fff;
+}
+
+@media (max-width: 600px) {
+    #plano { width: 150px; }
+    #plano-cono { left: -30px; top: -30px; width: 60px; height: 60px; }
+}
