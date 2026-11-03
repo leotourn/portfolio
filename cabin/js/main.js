@@ -2,7 +2,6 @@ import { Viewer } from "@photo-sphere-viewer/core";
 import { MarkersPlugin } from "@photo-sphere-viewer/markers-plugin";
 import { VirtualTourPlugin } from "@photo-sphere-viewer/virtual-tour-plugin";
 import { GyroscopePlugin } from "@photo-sphere-viewer/gyroscope-plugin";
-import { MapPlugin } from "@photo-sphere-viewer/map-plugin";
 
 const menu = document.querySelector("#menu");
 
@@ -45,23 +44,15 @@ const viewer = new Viewer({
             absolutePosition: false,  // false: parte desde donde estás mirando; true: usa la orientación real del aparato
             moveMode: "smooth",       // "smooth" suaviza el movimiento; "fast" responde al instante
         }],
-        [MapPlugin, {
-            rotation: "0deg",                  // se ajusta en el Paso 4
-            position: "top left",              // arriba, para no chocar con tu navbar inferior
-            size: esMovil ? "140px" : "200px",
-        }],
         [
             VirtualTourPlugin,
             {
                 positionMode: "manual",
                 renderMode: "2d",
                 startNodeId: "acceso",
-                map: {
-                    imageUrl: "img/plano-baja.png",
-                },
                 arrowStyle: {
                     image: "img/icons/disco.png",
-                    size: esMovil ? { width: 75, height: 45 } : { width: 50, height: 30 },
+                    size: esMovil ? { width: 64, height: 64 } : { width: 64, height: 64 },
                 },
                 nodes: [
                     {
@@ -69,7 +60,7 @@ const viewer = new Viewer({
                         panorama: "img/0001.jpg",
                         name: "Entrada",
                         caption:"Entrada",
-                        map: { x: 800, y: 1985 },
+                        map: { x: 410, y: 1285 },
                         links: [{ nodeId: "pasillo", position: { yaw: "3deg", pitch: "-3deg" } }]
                     },
                     {
@@ -77,10 +68,10 @@ const viewer = new Viewer({
                         panorama: "img/0002.jpg",
                         name: "Pasillo",
                         caption:"Hall de Distribución",
-                        map: { x: 834, y: 1602 },
+                        map: { x: 410, y: 770 },
                         links: [
                             { nodeId: "acceso", position: { yaw: "180deg", pitch: "0deg" }},
-                            { nodeId: "comedor", position: { yaw: "0deg", pitch: "0deg" }},
+                            { nodeId: "comedor", position: { yaw: "-1deg", pitch: "-12deg" }},
                             { nodeId: "living", position: { yaw: "55deg", pitch: "0deg" }},
                             { nodeId: "escalera", position: { yaw: "95deg", pitch: "0deg" }}
                         ]
@@ -90,7 +81,7 @@ const viewer = new Viewer({
                         panorama: "img/0003.jpg",
                         name: "Comedor",
                         caption: "Comedor",
-                        map: { x: 823, y: 981 },
+                        map: { x: 410, y: 470 },
                         links: [
                             { nodeId: "pasillo", position: { yaw: "180deg", pitch: "0deg" } },
                             { nodeId: "cocina", position: { yaw: "270deg", pitch: "0deg" } },
@@ -102,7 +93,8 @@ const viewer = new Viewer({
                         panorama: "img/0004.jpg",
                         name: "Living",
                         caption: "Living",
-                        map: { x: 1154, y: 1343 },
+                        map: { x: 550, y: 630 },
+                        data: { giro: 270 },
                         links: [{ nodeId: "pasillo", position: { yaw: "325deg", pitch: "-20deg" } }],
                         },
                     {
@@ -110,7 +102,8 @@ const viewer = new Viewer({
                         panorama: "img/0005.jpg",
                         name: "Cocina",
                         caption: "Cocina",
-                        map: { x: 524, y: 978 },
+                        map: { x: 310, y: 470 },
+                        data: { giro: 180 },     // grados extra para esta habitación
                         links: [{ nodeId: "comedor", position: { yaw: "270deg", pitch: "0deg" } }]
                     },
                     {
@@ -118,7 +111,8 @@ const viewer = new Viewer({
                         panorama: "img/0006.jpg",
                         name: "Escalera",
                         caption: "Escalera",
-                        map: { x: 1222, y: 1650 },
+                        data: {giro: 270},
+                        map: { x: 580, y: 790 },
                         links: [
                             { nodeId: "pasillo", position: { yaw: "20deg", pitch: "0deg" } },
                             { nodeId: "arriba", position: { yaw: "340deg", pitch: "0deg" } }
@@ -129,7 +123,7 @@ const viewer = new Viewer({
                         panorama: "img/0007.jpg",
                         name: "Planta Alta",
                         caption: "Planta Alta",
-                        map: { x: 711, y: 1613 },
+                        map: { x: 410, y: 790 },
                         links: [
                             { nodeId: "escalera", position: { yaw: "135deg", pitch: "0deg" } },
                             { nodeId: "dormitorio", position: { yaw: "320deg", pitch: "0deg" } }
@@ -140,7 +134,8 @@ const viewer = new Viewer({
                         panorama: "img/0008.jpg",
                         name: "Cuarto Principal",
                         caption: "Cuarto Principal",
-                        map: { x: 524, y: 1204 },
+                        map: { x: 245, y: 580 },
+                        data: { giro: 180 },
                         links: [
                             { nodeId: "arriba", position: { yaw: "320deg", pitch: "0deg" } },
                             { nodeId: "terraza", position: { yaw: "180deg", pitch: "0deg" } }
@@ -151,7 +146,7 @@ const viewer = new Viewer({
                         panorama: "img/0009.jpg",
                         name: "Terraza",
                         caption: "Terraza",
-                        map: { x: 575, y: 902 },
+                        map: { x: 245, y: 450 },
                         links: [
                             { nodeId: "dormitorio", position: { yaw: "180deg", pitch: "0deg" } }
                         ]
@@ -161,7 +156,7 @@ const viewer = new Viewer({
                         panorama: "img/0010.jpg",
                         name: "Deck",
                         caption: "Deck",
-                        map: { x: 840, y: 461 },
+                        map: { x: 410, y: 240 },
                         links: [
                             { nodeId: "comedor", position: { yaw: "180deg", pitch: "0deg" } }
                         ]
@@ -183,18 +178,48 @@ viewer.container.appendChild(menu);
 const tour = viewer.getPlugin(VirtualTourPlugin);
 const botones = document.querySelectorAll("#menu button");
 
+// ====== PLANO PROPIO ======
+const ROTACION_PLANO = 0;   // grados; ajústalo hasta que el abanico coincida con la realidad
+
+const plano = document.querySelector("#plano");
+const planoImg = document.querySelector("#plano-img");
+const planoPunto = document.querySelector("#plano-punto");
+const planoCono = document.querySelector("#plano-cono");
+viewer.container.appendChild(plano);   // dentro del visor, para que se vea en pantalla completa
+
+let nodoActual = null;
+
+function moverPunto() {
+    if (!nodoActual || !nodoActual.map || !planoImg.naturalWidth) return;
+    planoPunto.style.left = (nodoActual.map.x / planoImg.naturalWidth) * 100 + "%";
+    planoPunto.style.top = (nodoActual.map.y / planoImg.naturalHeight) * 100 + "%";
+}
+
+function girarAbanico() {
+    const grados = (viewer.getPosition().yaw * 180) / Math.PI;
+    const giroNodo = (nodoActual && nodoActual.data && nodoActual.data.giro) || 0;
+    planoCono.style.transform = `rotate(${grados + ROTACION_PLANO + giroNodo}deg)`;
+}
+
+planoImg.addEventListener("load", moverPunto);
+viewer.addEventListener("position-updated", girarAbanico);
+
+// Al cambiar de habitación: texto del botón, resaltado, y plano
+tour.addEventListener("node-changed", ({ node }) => {
+    etiqueta.textContent = `${node.caption || node.name} ▾`;
+    botones.forEach((b) => b.classList.toggle("activo", b.dataset.nodo === node.id));
+
+    nodoActual = node;
+    moverPunto();
+    girarAbanico();
+});
+
 // Al elegir una habitación: ir a ella y cerrar el desplegable
 botones.forEach((btn) => {
     btn.addEventListener("click", () => {
         tour.setCurrentNode(btn.dataset.nodo);
         menu.classList.remove("abierto");
     });
-});
-
-// Al cambiar de habitación: actualiza el texto del botón y resalta la actual
-tour.addEventListener("node-changed", ({ node }) => {
-    etiqueta.textContent = `${node.caption || node.name} ▾`;
-    botones.forEach((b) => b.classList.toggle("activo", b.dataset.nodo === node.id));
 });
 
 // Clic fuera: cierra el desplegable
