@@ -49,10 +49,12 @@ const viewer = new Viewer({
             {
                 positionMode: "manual",
                 renderMode: "2d",
-                startNodeId: "acceso",
+                startNodeId: "escalera",
                 arrowStyle: {
-                    image: "img/icons/disco.png",
-                    size: esMovil ? { width: 64, height: 64 } : { width: 64, height: 64 },
+                    image: "img/icons/disco.svg",
+                    size: esMovil ? { width: 32, height: 32 } : { width: 24, height: 24 },
+                    className: "disco-link",
+                    style: { filter: "none" },      // quita la sombra
                 },
                 nodes: [
                     {
@@ -61,7 +63,7 @@ const viewer = new Viewer({
                         name: "Entrada",
                         caption:"Entrada",
                         map: { x: 410, y: 1285 },
-                        links: [{ nodeId: "pasillo", position: { yaw: "3deg", pitch: "-3deg" } }]
+                        links: [{ nodeId: "pasillo", position: { yaw: "3deg", pitch: "3deg" } }]
                     },
                     {
                         id: "pasillo",
@@ -70,10 +72,10 @@ const viewer = new Viewer({
                         caption:"Hall de Distribución",
                         map: { x: 410, y: 770 },
                         links: [
-                            { nodeId: "acceso", position: { yaw: "180deg", pitch: "0deg" }},
+                            { nodeId: "acceso", position: { yaw: "177deg", pitch: "-10deg" }},
                             { nodeId: "comedor", position: { yaw: "-1deg", pitch: "-12deg" }},
-                            { nodeId: "living", position: { yaw: "55deg", pitch: "0deg" }},
-                            { nodeId: "escalera", position: { yaw: "95deg", pitch: "0deg" }}
+                            { nodeId: "living", position: { yaw: "41deg", pitch: "-18deg" }},
+                            { nodeId: "escalera", position: { yaw: "93deg", pitch: "9deg" }}
                         ]
                     },
                     {
@@ -83,9 +85,9 @@ const viewer = new Viewer({
                         caption: "Comedor",
                         map: { x: 410, y: 470 },
                         links: [
-                            { nodeId: "pasillo", position: { yaw: "180deg", pitch: "0deg" } },
-                            { nodeId: "cocina", position: { yaw: "270deg", pitch: "0deg" } },
-                            { nodeId: "deck", position: { yaw: "0deg", pitch: "0deg" } }
+                            { nodeId: "pasillo", position: { yaw: "180deg", pitch: "-11.5deg" } },
+                            { nodeId: "cocina", position: { yaw: "-85deg", pitch: "-20deg" } },
+                            { nodeId: "deck", position: { yaw: "-12deg", pitch: "-12deg" } }
                         ]
                     },
                     {
@@ -104,7 +106,7 @@ const viewer = new Viewer({
                         caption: "Cocina",
                         map: { x: 310, y: 470 },
                         data: { giro: 180 },     // grados extra para esta habitación
-                        links: [{ nodeId: "comedor", position: { yaw: "270deg", pitch: "0deg" } }]
+                        links: [{ nodeId: "comedor", position: { yaw: "-66deg", pitch: "-21deg" } }]
                     },
                     {
                         id: "escalera",
@@ -158,7 +160,7 @@ const viewer = new Viewer({
                         caption: "Deck",
                         map: { x: 410, y: 240 },
                         links: [
-                            { nodeId: "comedor", position: { yaw: "180deg", pitch: "0deg" } }
+                            { nodeId: "comedor", position: { yaw: "190deg", pitch: "-15deg" } }
                         ]
                     }
                 ]
@@ -228,3 +230,4 @@ document.addEventListener("pointerdown", (e) => {
         menu.classList.remove("abierto");
     }
 });
+
