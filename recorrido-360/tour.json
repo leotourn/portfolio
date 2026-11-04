@@ -1,0 +1,239 @@
+{
+  "titulo": "Cabaña de Madera",
+  "inicio": "acceso",
+  "rotacionPlano": 0,
+  "plantas": [
+    {
+      "id": "baja",
+      "nombre": "Planta baja",
+      "plano": "img/plano_baja.svg"
+    },
+    {
+      "id": "alta",
+      "nombre": "Planta alta",
+      "plano": "img/plano_alta.svg"
+    }
+  ],
+  "escenas": [
+    {
+      "id": "acceso",
+      "panorama": "img/0001.jpg",
+      "nombre": "Entrada",
+      "caption": "",
+      "planta": "baja",
+      "x": 410,
+      "y": 1235,
+      "giro": 0,
+      "links": [
+        {
+          "a": "pasillo",
+          "yaw": 0,
+          "pitch": 0
+        }
+      ]
+    },
+    {
+      "id": "pasillo",
+      "panorama": "img/0002.jpg",
+      "nombre": "Pasillo",
+      "caption": "Hall de Distribución",
+      "planta": "baja",
+      "x": 410,
+      "y": 715,
+      "giro": 0,
+      "links": [
+        {
+          "a": "comedor",
+          "yaw": 0,
+          "pitch": 0
+        },
+        {
+          "a": "living",
+          "yaw": 40.3,
+          "pitch": 0
+        },
+        {
+          "a": "escalera",
+          "yaw": 96.7,
+          "pitch": 15
+        },
+        {
+          "a": "acceso",
+          "yaw": -180,
+          "pitch": 0
+        }
+      ]
+    },
+    {
+      "id": "comedor",
+      "panorama": "img/0003.jpg",
+      "nombre": "Comedor",
+      "caption": "",
+      "planta": "baja",
+      "x": 410,
+      "y": 420,
+      "giro": 0,
+      "links": [
+        {
+          "a": "cocina",
+          "yaw": -90,
+          "pitch": 0
+        },
+        {
+          "a": "deck",
+          "yaw": 0,
+          "pitch": 0
+        },
+        {
+          "a": "pasillo",
+          "yaw": -180,
+          "pitch": 0
+        },
+        {
+          "a": "living",
+          "yaw": 132.9,
+          "pitch": 0
+        }
+      ]
+    },
+    {
+      "id": "living",
+      "panorama": "img/0004.jpg",
+      "nombre": "Living",
+      "caption": "",
+      "planta": "baja",
+      "x": 550,
+      "y": 550,
+      "giro": 270,
+      "links": [
+        {
+          "a": "comedor",
+          "yaw": 42.9,
+          "pitch": 0
+        },
+        {
+          "a": "pasillo",
+          "yaw": -49.7,
+          "pitch": 0
+        }
+      ]
+    },
+    {
+      "id": "cocina",
+      "panorama": "img/0005.jpg",
+      "nombre": "Cocina",
+      "caption": "",
+      "planta": "baja",
+      "x": 305,
+      "y": 420,
+      "giro": 180,
+      "links": [
+        {
+          "a": "comedor",
+          "yaw": -90,
+          "pitch": 0
+        }
+      ]
+    },
+    {
+      "id": "escalera",
+      "panorama": "img/0006.jpg",
+      "nombre": "Escalera",
+      "caption": "",
+      "planta": "baja",
+      "x": 580,
+      "y": 735,
+      "giro": 270,
+      "links": [
+        {
+          "a": "arriba",
+          "yaw": 340,
+          "pitch": 20
+        },
+        {
+          "a": "pasillo",
+          "yaw": 6.7,
+          "pitch": -15
+        }
+      ]
+    },
+    {
+      "id": "deck",
+      "panorama": "img/0010.jpg",
+      "nombre": "Deck",
+      "caption": "",
+      "planta": "baja",
+      "x": 410,
+      "y": 220,
+      "giro": 0,
+      "links": [
+        {
+          "a": "comedor",
+          "yaw": -180,
+          "pitch": 0
+        }
+      ]
+    },
+    {
+      "id": "arriba",
+      "panorama": "img/0007.jpg",
+      "nombre": "Planta Alta",
+      "caption": "",
+      "planta": "alta",
+      "x": 410,
+      "y": 730,
+      "giro": 0,
+      "links": [
+        {
+          "a": "escalera",
+          "yaw": 87,
+          "pitch": -35
+        },
+        {
+          "a": "dormitorio",
+          "yaw": -39.5,
+          "pitch": 0
+        }
+      ]
+    },
+    {
+      "id": "dormitorio",
+      "panorama": "img/0008.jpg",
+      "nombre": "Cuarto Principal",
+      "caption": "",
+      "planta": "alta",
+      "x": 245,
+      "y": 530,
+      "giro": 180,
+      "links": [
+        {
+          "a": "terraza",
+          "yaw": -180,
+          "pitch": 0
+        },
+        {
+          "a": "arriba",
+          "yaw": -39.5,
+          "pitch": 0
+        }
+      ]
+    },
+    {
+      "id": "terraza",
+      "panorama": "img/0009.jpg",
+      "nombre": "Terraza",
+      "caption": "",
+      "planta": "alta",
+      "x": 245,
+      "y": 370,
+      "giro": 0,
+      "links": [
+        {
+          "a": "dormitorio",
+          "yaw": -180,
+          "pitch": 0
+        }
+      ]
+    }
+  ]
+}
