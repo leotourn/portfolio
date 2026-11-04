@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Generador de recorridos 360°</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+:root{--bg:#f4f5f7;--card:#fff;--tx:#1d2330;--mut:#667;--ac:#1e78e6;--bd:#d9dde5;--err:#c62828;--warn:#b26a00;--ok:#2e7d32}
+@media (prefers-color-scheme:dark){:root{--bg:#14161b;--card:#1e222b;--tx:#e8eaf0;--mut:#9aa3b5;--bd:#333a48;--err:#ef6b6b;--warn:#e8a73c;--ok:#6bcf7a}}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,sans-serif}
+main{max-width:720px;margin:0 auto;padding:20px 16px 60px}
+h1{font-size:1.5rem;margin:.2em 0}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px;margin:14px 0}
+.card h2{font-size:1.05rem;margin:0 0 8px}
+p{margin:.4em 0;color:var(--mut)}
+button,.btn{background:var(--ac);color:#fff;border:0;border-radius:8px;padding:10px 16px;font:600 15px system-ui;cursor:pointer}
+button:disabled{opacity:.4;cursor:not-allowed}
+input[type=file]{max-width:100%}
+ul{padding-left:20px;margin:6px 0}
+.err{color:var(--err)}.warn{color:var(--warn)}.ok{color:var(--ok)}
+code{background:var(--bg);padding:1px 5px;border-radius:4px}
+details.card summary{cursor:pointer;font-weight:600;font-size:1.05rem}
+details.card h3{font-size:1rem;margin:1.2em 0 .3em}
+details.card table{border-collapse:collapse;width:100%;font-size:.9rem;display:block;overflow-x:auto}
+details.card th,details.card td{border:1px solid var(--bd);padding:6px 8px;text-align:left;vertical-align:top}
+pre{background:var(--bg);padding:10px;border-radius:8px;overflow-x:auto;font-size:.8rem}
+button+button{margin-left:6px}
+.chip{background:var(--bg);color:var(--tx);border:1px solid var(--bd);padding:5px 10px;margin:0 6px 6px 0;font-weight:500;font-size:14px}
+.chip.hecho{border-color:var(--ok)}
+.chip.sel{background:var(--ac);color:#fff;border-color:var(--ac)}
+.lienzo{position:relative;display:inline-block;max-width:100%;background:#f2f4f8;border:1px solid var(--bd);line-height:0}
+.lienzo.oscuro{background:#2a2f3a}
+.lienzo img{display:block;max-width:100%;height:auto;cursor:crosshair}
+.pin{position:absolute;transform:translate(-50%,-50%);width:22px;height:22px;border-radius:50%;background:#1e78e6;color:#fff;border:2px solid #fff;font:700 11px/18px system-ui;text-align:center;pointer-events:none;box-sizing:border-box}
+.pin.sel{background:#e65a1e;width:26px;height:26px;line-height:22px}
+#uMini{display:block;max-width:240px;border-radius:8px;margin:4px 0 10px}
+#uMini[hidden]{display:none}
+</style>
+</head>
+<body>
+<main>
+<h1>Generador de recorridos 360°</h1>
+<p>Excel o XML con tus escenas → ZIP con todos los archivos del recorrido (Photo Sphere Viewer 5.13.2).</p>
+
+<details class="card" id="tutorial">
+<summary>📖 Tutorial: cómo usar el generador (tocá para abrir)</summary>
+
+<h3>Qué necesitás</h3>
+<ul>
+<li>Tus fotos <b>equirectangulares</b> (360°), de preferencia no más de 4096 px de ancho para que carguen bien en celulares.</li>
+<li>Un <b>plano</b> por cada planta (PNG o SVG, mejor con fondo transparente).</li>
+<li>Internet al abrir este generador (carga las librerías de Excel y ZIP).</li>
+</ul>
+
+<h3>Paso 1: bajar la plantilla</h3>
+<p>Descargá la plantilla de Excel o de XML (la que te resulte más cómoda). Trae tu casa de ejemplo: editá esos datos y reemplazalos por los de tu proyecto.</p>
+
+<h3>Paso 2: completar los datos</h3>
+<p>Son cuatro bloques. En Excel son hojas; en XML son secciones.</p>
+<table>
+<tr><th>Bloque</th><th>Campos</th><th>Qué es</th></tr>
+<tr><td><b>Config</b></td><td>titulo, inicio, rotacionPlano, reciprocos</td><td>Título de la página, id de la escena inicial, giro global del plano (grados) y si los links se crean en ambas direcciones (<code>si</code>/<code>no</code>). Es opcional.</td></tr>
+<tr><td><b>Plantas</b></td><td>id, nombre, plano</td><td>Cada nivel de la casa y la ruta de su plano, por ejemplo <code>img/plano-baja.png</code>.</td></tr>
+<tr><td><b>Escenas</b></td><td>id, panorama, nombre, caption, planta, x, y, giro</td><td>Una por foto 360°. <code>id</code> sin espacios ni tildes. <code>caption</code> es opcional (si está vacío se usa el nombre). <code>x</code> e <code>y</code> son la posición en el plano.</td></tr>
+<tr><td><b>Links</b></td><td>origen, destino, yaw, pitch</td><td>Flechas para pasar de una escena a otra. <code>yaw</code> y <code>pitch</code> son opcionales.</td></tr>
+</table>
+
+<h3>Cómo obtener x e y</h3>
+<p><b>Forma interactiva (recomendada):</b> dejá las columnas <code>x</code> e <code>y</code> vacías (o los atributos sin valor), cargá tu archivo (punto 2) y los planos (punto 3), y andá al punto 5. Elegí la planta, hacé clic en el plano donde sacaste cada foto y pasa sola a la siguiente escena sin ubicar. Si cargaste las fotos 360° (punto 4), ves una miniatura de la escena seleccionada. Para corregir una, tocala en la lista y hacé clic de nuevo. Al terminar, tocá <b>Guardar planilla con coordenadas</b> para bajar tu Excel o XML ya completo: así no las perdés cuando regeneres el recorrido.</p>
+<p><b>Forma manual:</b></p>
+<p>Son píxeles medidos sobre el archivo del plano <b>en su tamaño original</b>, con el origen arriba a la izquierda. Abrí el plano en cualquier editor (Paint, GIMP, Inkscape) y leé la posición del cursor sobre cada habitación. Si tenés tu <code>coordenadas.html</code>, también sirve.</p>
+
+<h3>Yaw, pitch y giro</h3>
+<ul>
+<li><b>yaw vacío:</b> se calcula solo, con las posiciones de las dos escenas. Es una buena base para ajustar.</li>
+<li><b>yaw escrito:</b> se respeta tal cual (en grados, de -180 a 180). Es útil para escaleras y casos raros.</li>
+<li><b>pitch:</b> inclinación vertical de la flecha. Vacío es 0 (horizonte); negativo baja la flecha, positivo la sube.</li>
+<li><b>giro</b> (en Escenas): si el abanico azul del plano apunta para otro lado en esa escena, sumale 90, 180 o 270.</li>
+<li><b>rotacionPlano</b> (en Config): si el abanico sale corrido en todas las escenas por igual, ajustalo acá.</li>
+<li><b>Links recíprocos:</b> con <code>reciprocos = si</code>, alcanza con escribir A → B y se crea también B → A. Si querés un valor propio en la vuelta, escribí ese link a mano.</li>
+</ul>
+
+<h3>Formato XML</h3>
+<pre>&lt;recorrido&gt;
+  &lt;config titulo="Mi casa" inicio="acceso" rotacionPlano="0" reciprocos="si"/&gt;
+  &lt;plantas&gt;
+    &lt;planta id="baja" nombre="Planta baja" plano="img/plano-baja.png"/&gt;
+  &lt;/plantas&gt;
+  &lt;escenas&gt;
+    &lt;escena id="acceso" panorama="img/0001.jpg" nombre="Entrada"
+            planta="baja" x="410" y="1235" giro="0"/&gt;
+  &lt;/escenas&gt;
+  &lt;links&gt;
+    &lt;link origen="acceso" destino="pasillo" yaw="" pitch=""/&gt;
+  &lt;/links&gt;
+&lt;/recorrido&gt;</pre>
+<p>Todos los datos van como atributos. Los nombres de los atributos son los mismos que las columnas del Excel.</p>
+
+<h3>Paso 3: cargar tu archivo</h3>
+<p>En el punto 2 elegí tu <code>.xlsx</code> o <code>.xml</code>. Abajo, en el punto 7, aparece el informe:</p>
+<ul>
+<li><span class="err"><b>Errores</b></span> (rojo): hay que corregirlos; el botón de descarga queda bloqueado.</li>
+<li><span class="warn"><b>Avisos</b></span> (naranja): no bloquean, pero conviene revisarlos (escenas sin links, links entre plantas con yaw automático, imágenes no seleccionadas).</li>
+</ul>
+<p>Corregí tu archivo y volvé a elegirlo las veces que haga falta.</p>
+
+<h3>Paso 4: planos, fotos e íconos (opcionales)</h3>
+<p>Si elegís los planos (punto 3) y las fotos (punto 4), van dentro del ZIP y el generador verifica que coincidan con los nombres de tu archivo. Si no, copialos vos a la carpeta <code>img/</code> después. Los íconos (punto 6) ya vienen incluidos; subí los tuyos solo si querés cambiarlos.</p>
+<p>La coincidencia es por <b>nombre de archivo</b>: si el archivo dice <code>img/0001.jpg</code>, la foto tiene que llamarse <code>0001.jpg</code>.</p>
+
+<h3>Paso 5: descargar y probar</h3>
+<ol>
+<li>Tocá <b>Descargar ZIP</b> y descomprimilo.</li>
+<li>Si no cargaste las imágenes, copialas a <code>img/</code> con los mismos nombres que usaste.</li>
+<li>Abrí la carpeta en Phoenix Code y usá <b>Live Preview</b>.</li>
+<li>Recorré las escenas: revisá que las flechas apunten bien y que el abanico del plano coincida con lo que ves.</li>
+</ol>
+<p>No abras <code>index.html</code> con doble clic: el recorrido necesita un servidor (Live Preview o GitHub Pages).</p>
+
+<h3>Paso 6: ajustar y publicar</h3>
+<ul>
+<li><b>Ajuste rápido:</b> podés editar <code>tour.json</code> directamente (yaw, pitch, giro, x, y) y recargar. Pero esos cambios no vuelven al Excel; si regenerás el ZIP, se pierden. Pasalos a tu archivo cuando estés conforme.</li>
+<li><b>Ajuste de fondo:</b> corregí tu Excel o XML, volvé a generar y reemplazá los archivos.</li>
+<li><b>Publicar:</b> subí la carpeta a un repositorio de GitHub y activá <i>Settings → Pages</i>. Ojo: GitHub Pages distingue mayúsculas, así que <code>Foto.JPG</code> y <code>foto.jpg</code> son archivos distintos.</li>
+</ul>
+
+<h3>Si algo falla</h3>
+<ul>
+<li><b>Pantalla en blanco:</b> abrí la consola (F12) y mirá el error. Casi siempre es una ruta mal escrita o abrir el archivo sin servidor.</li>
+<li><b>No se ve una foto o el plano:</b> revisá que el nombre y la ruta coincidan exactamente con los del archivo, incluidas mayúsculas.</li>
+<li><b>El abanico apunta mal en una escena:</b> ajustá el <code>giro</code> de esa escena.</li>
+<li><b>Una flecha queda en un lugar raro:</b> escribí el <code>yaw</code> y el <code>pitch</code> a mano en ese link.</li>
+<li><b>Carga lenta en el celular:</b> reducí las fotos a 4096 px de ancho.</li>
+</ul>
+</details>
+
+<div class="card">
+<h2>1. Plantilla</h2>
+<p>Descargá la plantilla (viene con el ejemplo de tu casa) en el formato que prefieras y editala. Excel se guarda como <code>.xlsx</code>; el XML, como <code>.xml</code>.</p>
+<button id="btnPlantilla">Descargar plantilla Excel</button>
+<button id="btnPlantillaXml">Descargar plantilla XML</button>
+</div>
+
+<div class="card">
+<h2>2. Tu archivo (Excel o XML)</h2>
+<input type="file" id="fx" accept=".xlsx,.xls,.csv,.xml,application/xml,text/xml">
+</div>
+
+<div class="card">
+<h2>3. Planos de las plantas (opcional)</h2>
+<p>Elegí los planos (PNG, SVG, etc.) para que vayan dentro del ZIP, en <code>img/</code>, y se verifique que coincidan con la hoja Plantas. Si no, copialos vos después.</p>
+<input type="file" id="fp" accept="image/*" multiple>
+<p id="nplanos"></p>
+</div>
+
+<div class="card">
+<h2>4. Imágenes 360° (opcional)</h2>
+<p>Elegí las fotos equirectangulares para que vayan dentro del ZIP, en <code>img/</code>, y se verifique que existan. Si no, copialas vos después.</p>
+<input type="file" id="fi" accept="image/*" multiple>
+<p id="nimg"></p>
+</div>
+
+<div class="card">
+<h2>5. Ubicar las escenas en los planos (opcional)</h2>
+<p>Sirve si dejaste <code>x</code> e <code>y</code> vacíos en tu archivo. Elegí una escena y hacé clic en el plano, donde sacaste esa foto: pasa sola a la siguiente escena sin ubicar. Necesita tu archivo (punto 2) y los planos (punto 3); las fotos del punto 4 sirven para ver una miniatura de la escena.</p>
+<div id="ubicar"><p>Primero cargá tu archivo (punto 2).</p></div>
+</div>
+
+<div class="card">
+<h2>6. Íconos (opcional)</h2>
+<p>Ya vienen incluidos tus íconos. Si querés usar otros, subí tus propios <code>home.svg</code> y <code>disco.svg</code>.</p>
+<p>home.svg: <input type="file" id="fhome" accept=".svg,image/svg+xml"></p>
+<p>disco.svg: <input type="file" id="fdisco" accept=".svg,image/svg+xml"></p>
+</div>
+
+<div class="card">
+<h2>7. Resultado</h2>
+<div id="informe"><p>Todavía no cargaste ningún Excel.</p></div>
+<button id="btnZip" disabled>Descargar ZIP</button>
+</div>
+</main>
+
+<!-- ========== PLANTILLAS DE ARCHIVOS ========== -->
+<script type="text/plain" id="tpl-css">
+html,body{margin:0;height:100%;overflow:hidden}
+#viewer{width:100%;height:100vh;height:100dvh}
+.psv-container .psv-navbar{background:rgba(20,20,30,.2);border-radius:10px;width:460px;max-width:calc(100% - 24px);left:0;right:0;bottom:0;margin:0 auto 12px;justify-content:center}
+.psv-container .psv-button{color:#fff}
+.psv-container .psv-button:hover{background:rgba(255,255,255,.15)}
+.psv-virtual-tour-arrows{filter:none !important}
+.disco-link{animation:latido 2s ease-in-out infinite}
+@keyframes latido{0%,100%{opacity:.3;filter:drop-shadow(0 0 0 rgba(255,255,255,0))}50%{opacity:.9;filter:drop-shadow(0 0 8px rgba(255,255,255,.9))}}
+.disco-link:hover{animation:none;opacity:1}
+.btn-inicio{font-size:15px;width:20px;height:20px}
+.psv-container .psv-caption{color:#fff;font:600 16px system-ui,sans-serif}
+.psv-container .psv-button.btn-ubicaciones{width:auto;padding:0 12px;font:600 15px system-ui,sans-serif;color:#fff;white-space:nowrap;height:40px;line-height:40px}
+#menu{position:absolute;bottom:64px;left:50%;transform:translateX(-50%);z-index:1000;display:none;flex-direction:column;gap:2px;padding:6px;min-width:180px;max-height:60vh;overflow-y:auto;background:rgba(20,20,30,.75);border-radius:10px;backdrop-filter:blur(6px);touch-action:pan-y}
+#menu.abierto{display:flex}
+#menu button{border:0;padding:4px 14px;border-radius:8px;background:transparent;color:#fff;cursor:pointer;text-align:left;white-space:nowrap;font:500 14px system-ui,sans-serif;touch-action:manipulation}
+#menu button:hover{background:rgba(255,255,255,.15)}
+#menu button.activo{background:rgba(255,255,255,.6);color:#222}
+.menu-planta{padding:8px 14px 2px;font:600 12px system-ui,sans-serif;text-transform:uppercase;letter-spacing:.05em;color:rgba(255,255,255,.55)}
+.mi-marker{display:flex;align-items:center;justify-content:center;border-radius:50%;background:#ffd166;color:#222;font:700 18px system-ui,sans-serif;cursor:pointer}
+#plano{position:absolute;top:12px;left:12px;width:240px;z-index:50;pointer-events:none;filter:drop-shadow(0 0 3px rgba(0,0,0,.6));transition:opacity .3s}
+#plano.cambiando{opacity:0}
+#plano-img{display:block;width:100%;height:auto}
+#plano-punto{position:absolute;width:0;height:0;transition:left .4s ease,top .4s ease}
+#plano-cono{position:absolute;left:-45px;top:-45px;width:90px;height:90px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 90 90'%3E%3Cpath d='M45 45 L25 10 L65 10 Z' fill='%231e78e6' opacity='0.7'/%3E%3C/svg%3E") center/contain no-repeat}
+#plano-punto::after{content:"";position:absolute;left:-6px;top:-6px;width:12px;height:12px;box-sizing:border-box;border-radius:50%;background:#1e78e6;border:2px solid #fff}
+@media (max-width:600px){
+.psv-container .psv-button.btn-ubicaciones{font-size:14px;padding:0 8px}
+#menu{min-width:70vw}#menu button{padding:14px 16px}
+#plano{width:150px}#plano-cono{left:-30px;top:-30px;width:60px;height:60px}}
+</script>
+
+<script type="text/plain" id="tpl-main">
+import { Viewer } from "@photo-sphere-viewer/core";
+import { MarkersPlugin } from "@photo-sphere-viewer/markers-plugin";
+import { VirtualTourPlugin } from "@photo-sphere-viewer/virtual-tour-plugin";
+import { GyroscopePlugin } from "@photo-sphere-viewer/gyroscope-plugin";
+
+// Todos los datos del recorrido vienen de tour.json (generado desde el Excel)
+const cfg = await (await fetch("tour.json")).json();
+if (cfg.titulo) document.title = cfg.titulo;
+
+const PLANTAS = Object.fromEntries(cfg.plantas.map((p) => [p.id, p]));
+const nodes = cfg.escenas.map((e) => ({
+    id: e.id,
+    panorama: e.panorama,
+    name: e.nombre,
+    caption: e.caption || e.nombre,
+    map: { x: e.x, y: e.y },
+    data: { giro: e.giro || 0, planta: e.planta },
+    links: e.links.map((l) => ({ nodeId: l.a, position: { yaw: l.yaw + "deg", pitch: l.pitch + "deg" } })),
+}));
+
+const menu = document.querySelector("#menu");
+const etiqueta = document.createElement("span");
+etiqueta.textContent = "Ubicaciones ▾";
+const esMovil = window.matchMedia("(max-width: 600px), (pointer: coarse)").matches;
+
+const botonInicio = {
+    id: "btn-inicio",
+    title: "Ir al inicio",
+    content: '<img src="img/icons/home.svg" width="20" height="20" alt="">',
+    className: "btn-inicio",
+    onClick: (v) => v.getPlugin(VirtualTourPlugin).setCurrentNode(cfg.inicio),
+};
+const botonUbicaciones = {
+    id: "btn-ubicaciones",
+    title: "Ir a otra habitación",
+    content: etiqueta,
+    className: "btn-ubicaciones",
+    onClick: () => menu.classList.toggle("abierto"),
+};
+
+const viewer = new Viewer({
+    container: document.querySelector("#viewer"),
+    defaultZoomLvl: 10,
+    navbar: esMovil
+        ? [botonInicio, botonUbicaciones, "gyroscope", "fullscreen"]
+        : ["zoom", botonInicio, botonUbicaciones, "gyroscope", "fullscreen"],
+    plugins: [
+        MarkersPlugin,
+        [GyroscopePlugin, { touchmove: true, roll: true, absolutePosition: false, moveMode: "smooth" }],
+        [VirtualTourPlugin, {
+            positionMode: "manual",
+            renderMode: "2d",
+            startNodeId: cfg.inicio,
+            arrowStyle: {
+                image: "img/icons/disco.svg",
+                size: esMovil ? { width: 32, height: 32 } : { width: 48, height: 48 },
+                className: "disco-link",
+                style: { filter: "none" },
+            },
+            nodes,
+        }],
+    ],
+});
+
+viewer.container.appendChild(menu);
+["pointerdown", "pointermove", "pointerup", "touchstart", "touchmove", "touchend", "mousedown", "wheel"]
+    .forEach((ev) => menu.addEventListener(ev, (e) => e.stopPropagation(), { passive: true }));
+document.addEventListener("pointerdown", (e) => {
+    if (!menu.contains(e.target) && !e.target.closest(".btn-ubicaciones")) menu.classList.remove("abierto");
+});
+
+const tour = viewer.getPlugin(VirtualTourPlugin);
+
+// Menú agrupado por planta
+cfg.plantas.forEach((p) => {
+    const titulo = document.createElement("div");
+    titulo.className = "menu-planta";
+    titulo.textContent = p.nombre;
+    menu.appendChild(titulo);
+    cfg.escenas.filter((e) => e.planta === p.id).forEach((e) => {
+        const b = document.createElement("button");
+        b.dataset.nodo = e.id;
+        b.textContent = e.nombre;
+        menu.appendChild(b);
+    });
+});
+const botones = menu.querySelectorAll("button");
+botones.forEach((b) => b.addEventListener("click", () => {
+    tour.setCurrentNode(b.dataset.nodo);
+    menu.classList.remove("abierto");
+}));
+
+// ====== PLANO ======
+const ROTACION_PLANO = cfg.rotacionPlano || 0;
+const plano = document.querySelector("#plano");
+const planoImg = document.querySelector("#plano-img");
+const planoPunto = document.querySelector("#plano-punto");
+const planoCono = document.querySelector("#plano-cono");
+viewer.container.appendChild(plano);
+
+let nodoActual = null;
+let plantaActual = null;
+cfg.plantas.forEach((p) => { new Image().src = p.plano; });
+
+function mostrarPlanta(planta) {
+    if (planta === plantaActual) return false;
+    plantaActual = planta;
+    plano.classList.add("cambiando");
+    planoImg.src = PLANTAS[planta].plano;
+    return true;
+}
+function moverPunto() {
+    if (!nodoActual || !nodoActual.map || !planoImg.naturalWidth) return;
+    planoPunto.style.left = (nodoActual.map.x / planoImg.naturalWidth) * 100 + "%";
+    planoPunto.style.top = (nodoActual.map.y / planoImg.naturalHeight) * 100 + "%";
+}
+function girarAbanico() {
+    const grados = (viewer.getPosition().yaw * 180) / Math.PI;
+    const giroNodo = (nodoActual && nodoActual.data && nodoActual.data.giro) || 0;
+    planoCono.style.transform = `rotate(${grados + ROTACION_PLANO + giroNodo}deg)`;
+}
+planoImg.addEventListener("load", () => {
+    planoPunto.style.transition = "none";
+    moverPunto();
+    void planoPunto.offsetWidth;
+    planoPunto.style.transition = "";
+    plano.classList.remove("cambiando");
+});
+viewer.addEventListener("position-updated", girarAbanico);
+
+tour.addEventListener("node-changed", ({ node }) => {
+    etiqueta.textContent = `${node.caption || node.name} ▾`;
+    botones.forEach((b) => b.classList.toggle("activo", b.dataset.nodo === node.id));
+    nodoActual = node;
+    const planta = node.data && node.data.planta;
+    if (!PLANTAS[planta]) { console.warn(`El nodo "${node.id}" tiene una planta inválida:`, planta); return; }
+    if (!mostrarPlanta(planta)) moverPunto();
+    girarAbanico();
+});
+</script>
+
+<script>
+// ========== DATOS FIJOS ==========
+const V = "5.13.2", CDN = "https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/";
+const tpl = (id) => document.getElementById(id).textContent.replace(/^\n/, "");
+
+const INDEX_HTML = (titulo) => `<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${titulo.replace(/</g, "&lt;")}</title>
+${["core", "markers-plugin", "virtual-tour-plugin", "gyroscope-plugin"].map((p) =>
+`<link rel="stylesheet" href="${CDN}${p}@${V}/index.min.css">`).join("\n")}
+<link rel="stylesheet" href="css/style.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three/build/three.module.js",
+${["core", "markers-plugin", "virtual-tour-plugin", "gyroscope-plugin"].map((p) =>
+`    "@photo-sphere-viewer/${p}": "${CDN}${p}@${V}/index.module.js"`).join(",\n")}
+  }
+}
+<\/script>
+</head>
+<body>
+<div id="viewer"></div>
+<nav id="menu"></nav>
+<div id="plano" class="cambiando">
+  <img id="plano-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Plano">
+  <div id="plano-punto"><div id="plano-cono"></div></div>
+</div>
+<script type="module" src="js/main.js"><\/script>
+</body>
+</html>
+`;
+
+const HOME_SVG = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<!-- Created with Inkscape (http://www.inkscape.org/) -->\n\n<svg\n   width=\"512\"\n   height=\"512\"\n   viewBox=\"0 0 512 512\"\n   version=\"1.1\"\n   id=\"svg1\"\n   xml:space=\"preserve\"\n   sodipodi:docname=\"home.svg\"\n   inkscape:version=\"1.4.2 (f4327f4, 2025-05-13)\"\n   xmlns:inkscape=\"http://www.inkscape.org/namespaces/inkscape\"\n   xmlns:sodipodi=\"http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd\"\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:svg=\"http://www.w3.org/2000/svg\"><sodipodi:namedview\n     id=\"namedview1\"\n     pagecolor=\"#505050\"\n     bordercolor=\"#eeeeee\"\n     borderopacity=\"1\"\n     inkscape:showpageshadow=\"0\"\n     inkscape:pageopacity=\"0\"\n     inkscape:pagecheckerboard=\"0\"\n     inkscape:deskcolor=\"#505050\"\n     inkscape:document-units=\"px\"\n     inkscape:zoom=\"0.5772864\"\n     inkscape:cx=\"360.30643\"\n     inkscape:cy=\"245.97843\"\n     inkscape:window-width=\"1920\"\n     inkscape:window-height=\"1009\"\n     inkscape:window-x=\"-8\"\n     inkscape:window-y=\"-8\"\n     inkscape:window-maximized=\"1\"\n     inkscape:current-layer=\"g3\" /><defs\n     id=\"defs1\" /><g\n     inkscape:label=\"Capa 1\"\n     inkscape:groupmode=\"layer\"\n     id=\"layer1\"><g\n       id=\"g3\"\n       transform=\"translate(0,17.348497)\"><path\n         id=\"rect3\"\n         style=\"baseline-shift:baseline;display:inline;overflow:visible;opacity:1;vector-effect:none;fill:#ffffff;stroke-linecap:round;stroke-linejoin:round;paint-order:stroke fill markers;enable-background:accumulate;stop-color:#000000;stop-opacity:1\"\n         sodipodi:type=\"inkscape:offset\"\n         inkscape:radius=\"4.6528049\"\n         inkscape:original=\"M 256 3.1582031 A 25.0025 25.0025 0 0 0 249.5293 4.0097656 A 25.0025 25.0025 0 0 0 238.32227 10.480469 L 63.111328 185.69141 L 22.638672 226.16406 A 25 25 0 0 0 22.638672 261.51953 A 25 25 0 0 0 55.789062 263.47852 L 55.789062 449.14453 A 25.0025 25.0025 0 0 0 80.789062 474.14453 L 431.21094 474.14453 A 25.0025 25.0025 0 0 0 456.21094 449.14453 L 456.21094 263.47852 A 25 25 0 0 0 489.36133 261.51953 A 25 25 0 0 0 489.36133 226.16406 L 448.88867 185.69141 L 273.67773 10.480469 A 25.0025 25.0025 0 0 0 256 3.1582031 z M 256 63.513672 L 406.21094 213.72461 L 406.21094 424.14453 L 105.78906 424.14453 L 105.78906 213.72461 L 256 63.513672 z \"\n         d=\"m 256,-1.4941406 c -2.58773,-1.019e-4 -5.17424,0.3401583 -7.67383,1.0097656 a 4.6532701,4.6532701 0 0 0 -0.002,0 c -4.99888,1.33970699 -9.63152,4.0143697 -13.29102,7.6738281 a 4.6532701,4.6532701 0 0 0 0,0.00195 L 59.822266,182.40234 19.349609,222.875 c -5.488721,5.48927 -8.685547,13.20418 -8.685546,20.9668 0,7.76261 3.196825,15.47752 8.685546,20.96679 5.076794,5.07683 12.049609,8.21123 19.216797,8.63477 4.28556,0.25325 8.574628,-0.56934 12.570313,-2.13672 v 177.83789 c 7.76e-4,7.76275 3.196452,15.4777 8.685547,20.9668 5.489094,5.48909 13.204044,8.68477 20.966796,8.68554 H 431.21094 c 7.76275,-7.7e-4 15.4777,-3.19645 20.96679,-8.68554 5.4891,-5.4891 8.68478,-13.20405 8.68555,-20.9668 V 271.30664 c 3.99569,1.56738 8.28475,2.38997 12.57031,2.13672 7.16627,-0.42348 14.14017,-3.55714 19.2168,-8.63281 l 0.002,-0.002 c 5.48819,-5.48921 8.6836,-13.20459 8.6836,-20.96679 0,-7.76262 -3.19683,-15.47753 -8.68555,-20.9668 v -0.002 L 452.17773,182.40234 276.9668,7.1914062 a 4.6532701,4.6532701 0 0 0 0,-0.00195 C 271.47733,1.7004764 263.76294,-1.4938579 256,-1.4941406 Z M 256,70.091797 401.55859,215.65234 V 419.49219 H 110.44141 V 215.65234 Z\"\n         transform=\"matrix(0.97295589,0,0,0.97295589,6.9232922,6.4542496)\" /><path\n         id=\"path4\"\n         style=\"baseline-shift:baseline;display:inline;overflow:visible;opacity:1;vector-effect:none;fill:#ffffff;fill-opacity:0.5;stroke-linecap:round;stroke-linejoin:round;paint-order:stroke fill markers;enable-background:accumulate;stop-color:#000000;stop-opacity:1\"\n         sodipodi:type=\"inkscape:offset\"\n         inkscape:radius=\"-8.8122778\"\n         inkscape:original=\"M 256 70.091797 L 110.44141 215.65234 L 110.44141 419.49219 L 401.55859 419.49219 L 401.55859 215.65234 L 256 70.091797 z \"\n         d=\"M 256,82.552734 119.25391,219.30273 V 410.67969 H 392.74609 V 219.30273 Z\"\n         transform=\"matrix(0.97295589,0,0,0.97295589,6.9232922,6.4542496)\" /><\/g><\/g><\/svg>";
+const DISCO_SVG = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<!-- Created with Inkscape (http://www.inkscape.org/) -->\n\n<svg\n   width=\"512\"\n   height=\"512\"\n   viewBox=\"0 0 512 512\"\n   version=\"1.1\"\n   id=\"svg1\"\n   inkscape:version=\"1.4.2 (f4327f4, 2025-05-13)\"\n   sodipodi:docname=\"disco.svg\"\n   inkscape:export-filename=\"disco.png\"\n   inkscape:export-xdpi=\"96\"\n   inkscape:export-ydpi=\"96\"\n   xml:space=\"preserve\"\n   xmlns:inkscape=\"http://www.inkscape.org/namespaces/inkscape\"\n   xmlns:sodipodi=\"http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd\"\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:svg=\"http://www.w3.org/2000/svg\"><sodipodi:namedview\n     id=\"namedview1\"\n     pagecolor=\"#505050\"\n     bordercolor=\"#eeeeee\"\n     borderopacity=\"1\"\n     inkscape:showpageshadow=\"0\"\n     inkscape:pageopacity=\"0\"\n     inkscape:pagecheckerboard=\"0\"\n     inkscape:deskcolor=\"#505050\"\n     inkscape:document-units=\"px\"\n     inkscape:zoom=\"1.0151367\"\n     inkscape:cx=\"316.70611\"\n     inkscape:cy=\"259.0784\"\n     inkscape:window-width=\"1920\"\n     inkscape:window-height=\"1009\"\n     inkscape:window-x=\"-8\"\n     inkscape:window-y=\"-8\"\n     inkscape:window-maximized=\"1\"\n     inkscape:current-layer=\"layer1\"\n     showguides=\"true\" /><defs\n     id=\"defs1\"><inkscape:path-effect\n       effect=\"fillet_chamfer\"\n       id=\"path-effect9\"\n       is_visible=\"true\"\n       lpeversion=\"1\"\n       nodesatellites_param=\"F,0,1,1,0,13.884797,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,29.362611,0,1 @ F,0,0,1,0,29.362611,0,1 @ F,0,0,1,0,29.362611,0,1 @ F,0,0,1,0,29.362611,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,13.884797,0,1\"\n       radius=\"0\"\n       unit=\"px\"\n       method=\"auto\"\n       mode=\"F\"\n       chamfer_steps=\"1\"\n       flexible=\"false\"\n       use_knot_distance=\"true\"\n       apply_no_radius=\"true\"\n       apply_with_radius=\"true\"\n       only_selected=\"false\"\n       hide_knots=\"false\" /><\/defs><g\n     inkscape:label=\"Capa 1\"\n     inkscape:groupmode=\"layer\"\n     id=\"layer1\"><path\n       style=\"fill:none;fill-opacity:0.3;stroke:#000000;stroke-width:72;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:0.5;paint-order:stroke markers fill\"\n       d=\"M 152,36 H 120 C 73.464,36 36,73.464 36,120 v 32\"\n       id=\"path4\" /><path\n       style=\"fill:none;fill-opacity:0.3;stroke:#ffffff;stroke-width:24;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke markers fill\"\n       d=\"M 152,36 H 120 C 73.464,36 36,73.464 36,120 v 32\"\n       id=\"rect6\" /><path\n       id=\"rect7\"\n       style=\"fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:48;stroke-linecap:square;stroke-dasharray:none;stroke-opacity:0.5;paint-order:stroke markers fill\"\n       d=\"m 212.4278,135.98891 a 32.043799,32.043799 0 0 0 -25.87906,13.14561 l -19.399,26.56601 h -29.6595 a 34.423736,34.423736 0 0 0 -34.42452,34.42452 v 124.60742 a 34.423736,34.423736 0 0 0 34.42452,34.42452 h 237.0195 a 34.423736,34.423736 0 0 0 34.42452,-34.42452 V 210.12505 a 34.423736,34.423736 0 0 0 -34.42452,-34.42452 h -29.6595 l -19.399,-26.56601 a 32.043799,32.043799 0 0 0 -25.87906,-13.14561 z m 43.57219,51.9917 a 78.660804,78.660804 0 0 1 78.66074,78.66074 78.660804,78.660804 0 0 1 -78.66074,78.66073 78.660804,78.660804 0 0 1 -78.66074,-78.66073 78.660804,78.660804 0 0 1 78.66074,-78.66074 z m 101.10057,12.9235 h 12.42432 c 5.56885,0 10.05213,4.48329 10.05213,10.05212 0,5.56885 -4.48328,10.05213 -10.05213,10.05213 h -12.42432 c -5.56885,0 -10.05213,-4.48328 -10.05213,-10.05213 0,-5.56883 4.48328,-10.05212 10.05213,-10.05212 z m -101.10057,20.10425 a 45.632609,45.632609 0 0 0 -45.63299,45.63299 45.632609,45.632609 0 0 0 45.63299,45.63298 45.632609,45.632609 0 0 0 45.63299,-45.63298 45.632609,45.632609 0 0 0 -45.63299,-45.63299 z\" /><path\n       style=\"fill:none;fill-opacity:0.3;stroke:#000000;stroke-width:72;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:0.5;paint-order:stroke markers fill\"\n       d=\"m 360,36 h 32 c 46.536,0 84,37.464 84,84 v 32\"\n       id=\"path5\" /><path\n       style=\"fill:none;fill-opacity:0.3;stroke:#ffffff;stroke-width:24;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke markers fill\"\n       d=\"m 360,36 h 32 c 46.536,0 84,37.464 84,84 v 32\"\n       id=\"path6\" /><path\n       style=\"fill:none;fill-opacity:0.3;stroke:#000000;stroke-width:72;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:0.5;paint-order:stroke markers fill\"\n       d=\"M 152,476 H 120 C 73.464,476 36,438.536 36,392 v -32\"\n       id=\"path7\" /><path\n       style=\"fill:none;fill-opacity:0.3;stroke:#ffffff;stroke-width:24;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke markers fill\"\n       d=\"M 152,476 H 120 C 73.464,476 36,438.536 36,392 v -32\"\n       id=\"path8\" /><path\n       style=\"fill:none;fill-opacity:0.3;stroke:#000000;stroke-width:72;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:0.5;paint-order:stroke markers fill\"\n       d=\"m 360,476 h 32 c 46.536,0 84,-37.464 84,-84 v -32\"\n       id=\"path9\" /><path\n       style=\"fill:none;fill-opacity:0.3;stroke:#ffffff;stroke-width:24;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke markers fill\"\n       d=\"m 360,476 h 32 c 46.536,0 84,-37.464 84,-84 v -32\"\n       id=\"path10\" /><\/g><\/svg>";
+
+const LEEME = `RECORRIDO 360° - cómo usarlo
+1. Copiá tus fotos y planos dentro de la carpeta img/ (con los nombres del Excel).
+2. Abrí la carpeta en Phoenix Code (Live Preview) o subila a GitHub Pages.
+3. tour.json tiene todos los datos. Para cambiar algo, regenerá el ZIP desde el Excel.
+NOTA: no funciona abriendo index.html con doble clic (file://); necesita un servidor, como Live Preview o GitHub Pages.
+Reemplazá img/icons/disco.svg y home.svg por tus propios íconos si querés.
+`;
+
+// ========== PLANTILLAS (Excel y XML) ==========
+const DEMO = {
+  config: { titulo: "Recorrido virtual", inicio: "acceso", rotacionPlano: 0, reciprocos: "si" },
+  plantas: [
+    { id: "baja", nombre: "Planta baja", plano: "img/plano-baja.png" },
+    { id: "alta", nombre: "Planta alta", plano: "img/plano-alta.png" },
+  ],
+  escenas: [
+    ["acceso", "img/0001.jpg", "Entrada", "baja", 410, 1235],
+    ["pasillo", "img/0002.jpg", "Pasillo", "baja", 410, 715, 0, "Hall de Distribución"],
+    ["comedor", "img/0003.jpg", "Comedor", "baja", 410, 420],
+    ["living", "img/0004.jpg", "Living", "baja", 550, 550, 270],
+    ["cocina", "img/0005.jpg", "Cocina", "baja", 305, 420, 180],
+    ["escalera", "img/0006.jpg", "Escalera", "baja", 580, 735, 270],
+    ["deck", "img/0010.jpg", "Deck", "baja", 410, 220],
+    ["arriba", "img/0007.jpg", "Planta Alta", "alta", 410, 730],
+    ["dormitorio", "img/0008.jpg", "Cuarto Principal", "alta", 245, 530, 180],
+    ["terraza", "img/0009.jpg", "Terraza", "alta", 245, 370],
+  ].map(([id, panorama, nombre, planta, x, y, giro = 0, caption = ""]) => ({ id, panorama, nombre, caption, planta, x, y, giro })),
+  links: [
+    ["acceso", "pasillo"], ["pasillo", "comedor"], ["pasillo", "living"], ["pasillo", "escalera", "", 15],
+    ["comedor", "cocina"], ["comedor", "deck"], ["living", "comedor"], ["escalera", "arriba", 340, 20],
+    ["arriba", "escalera", 87, -35], ["arriba", "dormitorio"], ["dormitorio", "terraza"],
+  ].map(([origen, destino, yaw = "", pitch = ""]) => ({ origen, destino, yaw, pitch })),
+};
+
+function descargar(blob, nombre) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = nombre;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function plantilla() {
+  const wb = XLSX.utils.book_new();
+  const add = (n, rows) => XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), n);
+  add("Config", Object.entries(DEMO.config).map(([clave, valor]) => ({ clave, valor })));
+  add("Plantas", DEMO.plantas);
+  add("Escenas", DEMO.escenas);
+  add("Links", DEMO.links);
+  XLSX.writeFile(wb, "plantilla-recorrido.xlsx");
+}
+
+function plantillaXml() {
+  const esc = (v) => String(v).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+  const el = (tag, o) => `    <${tag} ` + Object.entries(o).map(([k, v]) => `${k}="${esc(v)}"`).join(" ") + "/>";
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<recorrido>
+  <config ${Object.entries(DEMO.config).map(([k, v]) => `${k}="${esc(v)}"`).join(" ")}/>
+  <plantas>
+${DEMO.plantas.map((o) => el("planta", o)).join("\n")}
+  </plantas>
+  <escenas>
+${DEMO.escenas.map((o) => el("escena", o)).join("\n")}
+  </escenas>
+  <links>
+${DEMO.links.map((o) => el("link", o)).join("\n")}
+  </links>
+</recorrido>
+`;
+  descargar(new Blob([xml], { type: "application/xml" }), "plantilla-recorrido.xml");
+}
+
+// Convierte un XML a filas con el mismo formato que las hojas de Excel
+function filasXml(doc, hojaNombre) {
+  const tag = { Plantas: "planta", Escenas: "escena", Links: "link" }[hojaNombre];
+  if (hojaNombre === "Config") {
+    const c = doc.getElementsByTagName("config")[0];
+    return c ? [...c.attributes].map((a) => ({ clave: a.name, valor: a.value })) : null;
+  }
+  const nodos = [...doc.getElementsByTagName(tag)];
+  if (!nodos.length && !doc.getElementsByTagName(tag + "s").length) return null;
+  return nodos.map((n) => Object.fromEntries([...n.attributes].map((a) => [a.name, a.value])));
+}
+
+// ========== LECTURA Y VALIDACIÓN ==========
+const num = (v) => (v === "" || v == null ? NaN : Number(String(v).replace(",", ".")));
+const norm = (a) => Math.round((((a + 180) % 360) + 360) % 360 * 10 - 1800) / 10;
+const angulo = (A, B, rot) => norm((Math.atan2(B.x - A.x, -(B.y - A.y)) * 180) / Math.PI - rot - A.giro);
+
+function leer(origen, coords = {}) {   // origen: { wb } (Excel) o { xml } (documento XML)
+  const errores = [], avisos = [];
+  const hoja = (n) => {
+    let filas;
+    if (origen.wb) {
+      const ws = origen.wb.Sheets[n];
+      filas = ws ? XLSX.utils.sheet_to_json(ws, { defval: "" }) : null;
+    } else filas = filasXml(origen.xml, n);
+    if (!filas) {
+      if (n !== "Config") errores.push(origen.wb ? `Falta la hoja "${n}".` : `Falta la sección "${n.toLowerCase()}" en el XML.`);
+      return [];
+    }
+    return filas.map((r) =>
+      Object.fromEntries(Object.entries(r).map(([k, v]) => [k.trim().toLowerCase(), typeof v === "string" ? v.trim() : v])));
+  };
+  const cfgRows = hoja("Config");
+  const c = Object.fromEntries(cfgRows.map((r) => [String(r.clave).toLowerCase(), r.valor]));
+  const rot = Number.isNaN(num(c.rotacionplano)) ? 0 : num(c.rotacionplano);
+  const recip = String(c.reciprocos ?? "si").toLowerCase() !== "no";
+
+  const plantas = hoja("Plantas").filter((p) => p.id);
+  const idsP = new Set(plantas.map((p) => String(p.id)));
+  plantas.forEach((p) => { if (!p.plano) errores.push(`Planta "${p.id}": falta el archivo del plano.`); });
+  if (!plantas.length) errores.push("No hay plantas en la hoja Plantas.");
+
+  const escenas = [], vistos = new Set(), pend = [];
+  hoja("Escenas").filter((e) => e.id !== "").forEach((e, i) => {
+    const id = String(e.id), f = `Escenas, fila ${i + 2} ("${id}")`;
+    if (vistos.has(id)) errores.push(`${f}: id repetido.`);
+    vistos.add(id);
+    if (/\s/.test(id)) avisos.push(`${f}: el id tiene espacios; mejor sin ellos.`);
+    if (!e.panorama) errores.push(`${f}: falta la imagen panorama.`);
+    if (!idsP.has(String(e.planta))) errores.push(`${f}: la planta "${e.planta}" no existe en la hoja Plantas.`);
+    const co = coords[id];
+    const x = co ? co.x : num(e.x), y = co ? co.y : num(e.y);
+    if (Number.isNaN(x) || Number.isNaN(y)) {
+      if (e.x === "" || e.y === "" || e.x == null || e.y == null) pend.push(id);
+      else errores.push(`${f}: x e y deben ser números.`);
+    }
+    escenas.push({ id, panorama: String(e.panorama), nombre: String(e.nombre || id), caption: String(e.caption || ""),
+      planta: String(e.planta), x, y, giro: num(e.giro) || 0, links: [] });
+  });
+  if (!escenas.length) errores.push("No hay escenas en la hoja Escenas.");
+  if (pend.length) errores.push(`Faltan las coordenadas (x, y) de ${pend.length} escena(s): ${pend.join(", ")}. Asignalas en el punto 5 o escribilas en tu archivo.`);
+  const porId = Object.fromEntries(escenas.map((e) => [e.id, e]));
+
+  const inicio = String(c.inicio || (escenas[0] && escenas[0].id) || "");
+  if (!porId[inicio]) errores.push(`Config: la escena de inicio "${inicio}" no existe.`);
+
+  const explicitos = new Set();
+  const filas = hoja("Links").filter((l) => l.origen !== "");
+  filas.forEach((l) => explicitos.add(l.origen + ">" + l.destino));
+  const crear = (A, B, yaw, pitch, desc) => {
+    if (A.links.some((k) => k.a === B.id)) { avisos.push(`Link repetido ${A.id} → ${B.id}; se ignora el duplicado.`); return; }
+    let y = num(yaw);
+    if (Number.isNaN(y)) {
+      y = angulo(A, B, rot);
+      if (A.planta !== B.planta) avisos.push(`${desc}: yaw automático entre plantas distintas; revisalo en el recorrido.`);
+    }
+    const p = Number.isNaN(num(pitch)) ? 0 : num(pitch);
+    A.links.push({ a: B.id, yaw: y, pitch: p });
+  };
+  filas.forEach((l, i) => {
+    const A = porId[l.origen], B = porId[l.destino], f = `Links, fila ${i + 2}`;
+    if (!A) return errores.push(`${f}: el origen "${l.origen}" no existe.`);
+    if (!B) return errores.push(`${f}: el destino "${l.destino}" no existe.`);
+    crear(A, B, l.yaw, l.pitch, `${A.id} → ${B.id}`);
+  });
+  if (recip) filas.forEach((l) => {
+    const A = porId[l.origen], B = porId[l.destino];
+    if (A && B && !explicitos.has(B.id + ">" + A.id))
+      crear(B, A, "", Number.isNaN(num(l.pitch)) ? "" : -num(l.pitch), `${B.id} → ${A.id} (recíproco)`);
+  });
+  escenas.forEach((e) => { if (!e.links.length) avisos.push(`La escena "${e.id}" no tiene ningún link (queda aislada).`); });
+
+  return { errores, avisos, tour: { titulo: String(c.titulo || "Recorrido virtual"), inicio, rotacionPlano: rot,
+    plantas: plantas.map((p) => ({ id: String(p.id), nombre: String(p.nombre || p.id), plano: String(p.plano) })), escenas } };
+}
+
+// ========== UBICAR ESCENAS EN LOS PLANOS ==========
+let ultimoOrigen = null, coords = {}, selId = null, plantaSel = null, fondoOscuro = false;
+const tienePos = (e) => Number.isFinite(e.x) && Number.isFinite(e.y);
+const base = (r) => String(r).split("/").pop().toLowerCase();
+const h = (v) => String(v).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+const urls = new Map();
+const urlDe = (f) => { if (!urls.has(f)) urls.set(f, URL.createObjectURL(f)); return urls.get(f); };
+
+function renderUbicar() {
+  const box = $("ubicar"), t = resultado && resultado.tour;
+  if (!t || !t.plantas.length || !t.escenas.length) { box.innerHTML = "<p>Primero cargá tu archivo (punto 2).</p>"; return; }
+  if (!t.plantas.some((p) => p.id === plantaSel)) plantaSel = t.plantas[0].id;
+  const pl = t.plantas.find((p) => p.id === plantaSel);
+  const archivo = planos.get(base(pl.plano));
+  const esc = t.escenas.filter((e) => e.planta === plantaSel);
+  if (!esc.some((e) => e.id === selId)) selId = (esc.find((e) => !tienePos(e)) || esc[0] || {}).id;
+  box.innerHTML = `
+<p><select id="uPlanta">${t.plantas.map((p) => `<option value="${h(p.id)}"${p.id === plantaSel ? " selected" : ""}>${h(p.nombre)}</option>`).join("")}</select>
+<button type="button" id="uFondo">Cambiar fondo</button>
+<button type="button" id="uGuardar">Guardar planilla con coordenadas</button></p>
+<p id="uProgreso"></p>
+<div id="uChips"></div>
+<img id="uMini" alt="" hidden>
+${archivo
+    ? `<div id="uLienzo" class="lienzo${fondoOscuro ? " oscuro" : ""}"><img id="uImg" src="${urlDe(archivo)}" alt="Plano"></div><p id="uTam"></p>`
+    : `<p class="warn">Falta cargar en el punto 3 el plano <code>${h(base(pl.plano))}</code> (planta «${h(pl.nombre)}»).</p>`}`;
+  $("uPlanta").onchange = (e) => { plantaSel = e.target.value; selId = null; renderUbicar(); };
+  $("uFondo").onclick = () => { fondoOscuro = !fondoOscuro; const l = $("uLienzo"); if (l) l.classList.toggle("oscuro", fondoOscuro); };
+  $("uGuardar").onclick = guardarPlanilla;
+  $("uChips").onclick = (ev) => { const b = ev.target.closest("[data-id]"); if (b) { selId = b.dataset.id; pintarUbicar(); } };
+  const img = $("uImg");
+  if (img) {
+    img.onload = pintarUbicar;
+    img.onclick = (ev) => {
+      if (!selId || !img.naturalWidth) return;
+      const r = img.getBoundingClientRect();
+      const x = Math.round(((ev.clientX - r.left) / r.width) * img.naturalWidth);
+      const y = Math.round(((ev.clientY - r.top) / r.height) * img.naturalHeight);
+      coords[selId] = { x, y };
+      const sig = esc.find((e) => e.id !== selId && !tienePos(e));
+      if (sig) selId = sig.id;
+      resultado = leer(ultimoOrigen, coords);
+      informe();
+      pintarUbicar();
+    };
+  }
+  pintarUbicar();
+}
+
+function pintarUbicar() {
+  const t = resultado && resultado.tour;
+  if (!t || !$("uChips")) return;
+  const esc = t.escenas.filter((e) => e.planta === plantaSel);
+  const sel = esc.find((e) => e.id === selId);
+  $("uProgreso").textContent = `${esc.filter(tienePos).length} de ${esc.length} escenas ubicadas en esta planta.` + (sel ? ` Seleccionada: ${sel.nombre}.` : "");
+  $("uChips").innerHTML = esc.map((e, i) =>
+    `<button type="button" class="chip${e.id === selId ? " sel" : ""}${tienePos(e) ? " hecho" : ""}" data-id="${h(e.id)}">${i + 1}. ${h(e.nombre)}${tienePos(e) ? " ✓" : ""}</button>`).join("");
+  const mini = $("uMini"), foto = sel && imagenes.get(base(sel.panorama));
+  mini.hidden = !foto;
+  if (foto) mini.src = urlDe(foto);
+  const img = $("uImg"), lienzo = $("uLienzo");
+  if (!lienzo) return;
+  lienzo.querySelectorAll(".pin").forEach((p) => p.remove());
+  if (!img.naturalWidth) return;
+  $("uTam").textContent = `Tamaño del plano: ${img.naturalWidth} × ${img.naturalHeight} px (las coordenadas se miden sobre este tamaño).`;
+  esc.forEach((e, i) => {
+    if (!tienePos(e)) return;
+    const d = document.createElement("div");
+    d.className = "pin" + (e.id === selId ? " sel" : "");
+    d.textContent = i + 1;
+    d.title = e.nombre;
+    d.style.left = (e.x / img.naturalWidth) * 100 + "%";
+    d.style.top = (e.y / img.naturalHeight) * 100 + "%";
+    lienzo.appendChild(d);
+  });
+}
+
+// Guarda en la planilla original las coordenadas, para no perderlas al regenerar
+function guardarPlanilla() {
+  const t = resultado && resultado.tour;
+  if (!t || !ultimoOrigen) return;
+  const pos = Object.fromEntries(t.escenas.filter(tienePos).map((e) => [e.id, e]));
+  if (ultimoOrigen.wb) {
+    const wb = ultimoOrigen.wb;
+    if (!wb.Sheets.Escenas) return;
+    const filas = XLSX.utils.sheet_to_json(wb.Sheets.Escenas, { defval: "" });
+    const clave = (r, n) => Object.keys(r).find((k) => k.trim().toLowerCase() === n) || n;
+    filas.forEach((r) => {
+      const kx = clave(r, "x"), ky = clave(r, "y"), p = pos[String(r[clave(r, "id")]).trim()];
+      if (!(kx in r)) r[kx] = "";
+      if (!(ky in r)) r[ky] = "";
+      if (p) { r[kx] = p.x; r[ky] = p.y; }
+    });
+    wb.Sheets.Escenas = XLSX.utils.json_to_sheet(filas);
+    XLSX.writeFile(wb, "recorrido-con-coordenadas.xlsx");
+  } else {
+    const doc = ultimoOrigen.xml;
+    [...doc.getElementsByTagName("escena")].forEach((n) => {
+      const p = pos[n.getAttribute("id")];
+      if (p) { n.setAttribute("x", p.x); n.setAttribute("y", p.y); }
+    });
+    descargar(new Blob([new XMLSerializer().serializeToString(doc)], { type: "application/xml" }), "recorrido-con-coordenadas.xml");
+  }
+}
+
+// ========== INTERFAZ ==========
+let resultado = null;
+const imagenes = new Map(); // fotos 360: nombre -> File
+const planos = new Map();   // planos: nombre -> File
+const $ = (id) => document.getElementById(id);
+
+function informe() {
+  if (!resultado) return;
+  const { errores, avisos, tour } = resultado;
+  const av = [...avisos];
+  const falta = (mapa, ruta) => !mapa.has(ruta.split("/").pop().toLowerCase());
+  if (planos.size) tour.plantas.forEach((p) => falta(planos, p.plano) && av.push(`Plano no seleccionado: ${p.plano}`));
+  if (imagenes.size) tour.escenas.forEach((e) => falta(imagenes, e.panorama) && av.push(`Imagen 360° no seleccionada: ${e.panorama}`));
+  const li = (arr, cls) => arr.length ? `<ul class="${cls}">${arr.map((t) => `<li>${t.replace(/</g, "&lt;")}</li>`).join("")}</ul>` : "";
+  const nl = tour.escenas.reduce((s, e) => s + e.links.length, 0);
+  $("informe").innerHTML = errores.length
+    ? `<p class="err"><b>${errores.length} error(es) a corregir:</b></p>${li(errores, "err")}${li(av, "warn")}`
+    : `<p class="ok"><b>Todo en orden:</b> ${tour.plantas.length} planta(s), ${tour.escenas.length} escena(s), ${nl} link(s).</p>${av.length ? "<p><b>Avisos:</b></p>" : ""}${li(av, "warn")}`;
+  $("btnZip").disabled = errores.length > 0;
+}
+
+$("btnPlantilla").onclick = plantilla;
+$("btnPlantillaXml").onclick = plantillaXml;
+$("fx").onchange = async (e) => {
+  const f = e.target.files[0];
+  if (!f) return;
+  try {
+    if (/\.xml$/i.test(f.name)) {
+      const doc = new DOMParser().parseFromString(await f.text(), "application/xml");
+      const pe = doc.getElementsByTagName("parsererror")[0];
+      if (pe) throw new Error("el XML tiene errores de formato (¿falta cerrar alguna etiqueta o comilla?)");
+      ultimoOrigen = { xml: doc };
+    } else ultimoOrigen = { wb: XLSX.read(await f.arrayBuffer()) };
+    coords = {}; selId = null;
+    resultado = leer(ultimoOrigen, coords);
+    informe();
+    renderUbicar();
+  }
+  catch (err) { resultado = null; ultimoOrigen = null; renderUbicar(); $("btnZip").disabled = true; $("informe").innerHTML = `<p class="err">No pude leer el archivo: ${err.message}</p>`; }
+};
+$("fp").onchange = (e) => {
+  planos.clear();
+  [...e.target.files].forEach((f) => planos.set(f.name.toLowerCase(), f));
+  $("nplanos").textContent = `${planos.size} plano(s) seleccionado(s).`;
+  informe();
+  renderUbicar();
+};
+$("fi").onchange = (e) => {
+  imagenes.clear();
+  [...e.target.files].forEach((f) => imagenes.set(f.name.toLowerCase(), f));
+  $("nimg").textContent = `${imagenes.size} imagen(es) 360° seleccionada(s).`;
+  informe();
+  renderUbicar();
+};
+
+let homeSvg = null, discoSvg = null;
+$("fhome").onchange = async (e) => { homeSvg = e.target.files[0] ? await e.target.files[0].text() : null; };
+$("fdisco").onchange = async (e) => { discoSvg = e.target.files[0] ? await e.target.files[0].text() : null; };
+
+$("btnZip").onclick = async () => {
+  const { tour } = resultado, zip = new JSZip();
+  zip.file("tour.json", JSON.stringify(tour, null, 2));
+  zip.file("index.html", INDEX_HTML(tour.titulo));
+  zip.file("css/style.css", tpl("tpl-css"));
+  zip.file("js/main.js", tpl("tpl-main"));
+  zip.file("img/icons/home.svg", homeSvg || HOME_SVG);
+  zip.file("img/icons/disco.svg", discoSvg || DISCO_SVG);
+  zip.file("LEEME.txt", LEEME);
+  const agregar = (rutas, mapa) => rutas.forEach((r) => {
+    const f = mapa.get(r.split("/").pop().toLowerCase());
+    if (f) zip.file(r, f);
+  });
+  agregar(tour.plantas.map((p) => p.plano), planos);
+  agregar(tour.escenas.map((e) => e.panorama), imagenes);
+  const blob = await zip.generateAsync({ type: "blob" });
+  descargar(blob, "recorrido-360.zip");
+};
+</script>
+</body>
+</html>
