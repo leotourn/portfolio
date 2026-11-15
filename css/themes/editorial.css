@@ -1,0 +1,25 @@
+/* ============================================
+   TEMA: EDITORIAL (el diseño original)
+   Serif elegante, fondo hueso y acento terracota.
+   ============================================ */
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Inter:wght@300;400;500&display=swap");
+
+:root {
+    --font-display: "Cormorant Garamond", serif;
+    --font-body: "Inter", sans-serif;
+
+    --bg: #f4f2ee;
+    --fg: #1a1a1a;
+    --muted: #6b6b6b;
+    --accent: #c9462c;
+    --line: rgba(26, 26, 26, 0.15);
+    --ease: cubic-bezier(0.77, 0, 0.175, 1);
+
+    /* Gradientes placeholder de proyectos (reemplazar por imágenes) */
+    --grad-1: linear-gradient(135deg, #3a3a3a, #8a8a8a);
+    --grad-2: linear-gradient(135deg, #5a4a3a, #a89080);
+    --grad-3: linear-gradient(135deg, #2a2a2a, #6a6a6a);
+    --grad-4: linear-gradient(135deg, #4a5a4a, #8a9a8a);
+    --grad-5: linear-gradient(135deg, #6a4a3a, #b89080);
+    --grad-6: linear-gradient(135deg, #3a3a4a, #7a7a8a);
+}

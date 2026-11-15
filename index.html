@@ -1,72 +1,633 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tu Nombre | Arquitectura & Diseño</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="description" content="Portfolio de arquitectura, interiorismo y diseño gráfico." />
+        <title>Portfolio — Arquitecto &amp; Diseñador Gráfico</title>
 
-    <!-- Menú de Navegación Fijo -->
-    <nav class="navbar">
-        <div class="logo">ESTUDIO_</div>
-        <div class="nav-links">
-            <a href="#hero">Inicio</a>
-            <a href="#renders">Renders</a>
-            <a href="#tecnico">Dibujo Técnico</a>
-            <a href="#contacto">Contacto</a>
-            <a href="/portfolio/exp/test.html">Godot</a>
-        </div>
-    </nav>
+        <!-- Estilos: base común + tema activo (theme-init.js escribe el <link> del tema antes de pintar) -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link rel="stylesheet" href="css/base.css" />
+        <script src="js/theme-init.js"></script>
+        <noscript><link rel="stylesheet" href="css/themes/editorial.css" /></noscript>
 
-    <!-- Sección 1: Hero / Portada -->
-    <section style="background-color: rgb(131, 138, 134);" id="hero" class="section hero-section">
-        <div class="hero-content">
-            <h1>Recorrido Virtual</h1>
-            <br/>
-            <iframe
-                src="https://leotourn.github.io/portfolio/cabin/"
-                width="100%"
-                height="600px"
-                frameborder="40px"
-                allowfullscreen
-                style="border: none; border-radius: 0px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
-            </iframe>
+        <!-- Scripts -->
+        <script src="js/main.js" defer></script>
+    </head>
+
+    <body>
+        <!-- LOADER -->
+        <div class="loader" id="loader" aria-hidden="true">
+            <span><i>P</i><i>O</i><i>R</i><i>T</i><i>F</i><i>O</i><i>L</i><i>I</i><i>O</i></span>
         </div>
-    </section>
-    <!-- Sección 2: Galería de Renders -->
-    <section id="renders" class="section reveal">
-        <h2>01 / VISUALIZACIÓN & RENDERS</h2>
-        <div class="grid-portfolio">
-            <div class="card">
-                <img src="https://placeholder.com" alt="Render Exterior">
-                <div class="card-info"><h3>Residencia MM / Exterior</h3><p>Blender + Cycles</p></div>
+
+        <!-- CURSOR PERSONALIZADO -->
+        <div class="cursor" id="cursor" aria-hidden="true"></div>
+
+        <!-- HEADER -->
+        <header>
+            <a href="#inicio" class="logo">TU <span>Nombre</span></a>
+            <button class="menu-toggle" id="menuToggle" type="button" aria-expanded="false" aria-controls="menuOverlay">
+                <span>Menu</span>
+                <span class="bars" aria-hidden="true"><span></span><span></span></span>
+            </button>
+        </header>
+
+        <!-- MENÚ OVERLAY -->
+        <nav class="menu-overlay" id="menuOverlay" aria-label="Navegación principal">
+            <div class="menu-inner">
+                <div class="menu-nav">
+                    <ul>
+                        <li><a href="#inicio">Inicio <span class="num">01</span></a></li>
+                        <li><a href="#proyectos">Proyectos <span class="num">02</span></a></li>
+                        <li><a href="#sobre-mi">Sobre mí <span class="num">03</span></a></li>
+                        <li><a href="#contacto">Contacto <span class="num">04</span></a></li>
+                    </ul>
+                </div>
+
+                <div class="menu-info">
+                    <div>
+                        <h4>Estudio</h4>
+                        <p>Calle Ejemplo 123<br />Ciudad, País<br />CP 00000</p>
+                        <h4>Horario</h4>
+                        <p>Lun — Vie<br />09:00 — 18:00</p>
+                    </div>
+                    <div>
+                        <h4>Sígueme</h4>
+                        <div class="socials">
+                            <a href="#">Instagram</a>
+                            <a href="#">Behance</a>
+                            <a href="#">LinkedIn</a>
+                            <a href="#">Vimeo</a>
+                        </div>
+                        <h4>Diseño</h4>
+                        <div class="theme-switcher">
+                            <button type="button" data-theme-option="editorial">Editorial</button>
+                            <button type="button" data-theme-option="brutalista">Brutalista</button>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="card">
-                <img src="https://placeholder.com" alt="Render Interior">
-                <div class="card-info"><h3>Penthouse ST / Interior</h3><p>Modelado BIM + Twinmotion</p></div>
-            </div>
-        </div>
-    </section>
+        </nav>
 
-    <!-- Sección 3: Dibujo Técnico / Planos -->
-    <section id="tecnico" class="section reveal">
-        <h2>02 / DETALLE TÉCNICO & PLANOS</h2>
-        <div class="grid-portfolio text-left">
-            <div class="card item-wide">
-                <img src="https://placeholder.com" alt="Plano Técnico de Corte">
-                <div class="card-info"><h3>Detalle Constructivo Escala 1:20</h3><p>Documentación técnica de fachada ventilada.</p></div>
-            </div>
-        </div>
-    </section>
+        <!-- PREVIEW DE PROYECTO (sigue al cursor) -->
+        <div class="project-preview" id="projectPreview" aria-hidden="true"></div>
 
-    <!-- Sección 4: Contacto -->
-    <section id="contacto" class="section reveal footer-section">
-        <h2>¿TRABAJAMOS JUNTOS?</h2>
-        <p>Envíame un correo para cotizaciones o colaboraciones.</p>
-        <a href="mailto:tuemail@correo.com" class="btn-contact">tuemail@correo.com</a>
-    </section>
+        <main>
+            <!-- =================== PANTALLA: HOME =================== -->
+            <section class="screen active" id="screen-inicio">
+                <div class="home-hero">
+                    <h1>
+                        <span class="line"><span>Arquitectura</span></span>
+                        <span class="line"><span>&amp; Diseño</span></span>
+                        <span class="line"><span>Gráfico.</span></span>
+                    </h1>
+                    <div class="home-meta">
+                        <p>
+                            Estudio multidisciplinar enfocado en la creación de espacios y piezas gráficas con identidad
+                            propia. Desde 2015 explorando la intersección entre lo construido y lo comunicado.
+                        </p>
+                        <div class="scroll-hint">Descubrir</div>
+                    </div>
+                </div>
 
-</body>
+                <div class="featured">
+                    <div class="section-label">
+                        <span>Proyectos destacados</span>
+                        <span>2024 — 2026</span>
+                    </div>
+                    <div class="featured-grid">
+                        <a class="feat-item" href="#proyecto-casa-horizonte">
+                            <div class="img grad-1"></div>
+                            <div class="caption">
+                                <small>Arquitectura</small>
+                                <h3>Casa Horizonte</h3>
+                            </div>
+                        </a>
+                        <a class="feat-item" href="#proyecto-loft-central">
+                            <div class="img grad-2"></div>
+                            <div class="caption">
+                                <small>Interiorismo</small>
+                                <h3>Loft Central</h3>
+                            </div>
+                        </a>
+                        <a class="feat-item" href="#proyecto-identidad-nova">
+                            <div class="img grad-3"></div>
+                            <div class="caption">
+                                <small>Diseño Gráfico</small>
+                                <h3>Identidad Nova</h3>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- =================== PANTALLA: PROYECTOS =================== -->
+            <section class="screen" id="screen-proyectos">
+                <div class="screen-header">
+                    <h2>Proyectos<br /><em class="serif">seleccionados.</em></h2>
+                    <div class="count">06 trabajos</div>
+                </div>
+
+                <ul class="project-list" id="projectList">
+                    <li data-gradient="grad-1">
+                        <a href="#proyecto-casa-horizonte">
+                            <span class="num">01</span>
+                            <h3>Casa Horizonte</h3>
+                            <span class="cat">Arquitectura</span>
+                            <span class="year">2026</span>
+                            <span class="arrow" aria-hidden="true">→</span>
+                        </a>
+                    </li>
+                    <li data-gradient="grad-2">
+                        <a href="#proyecto-loft-central">
+                            <span class="num">02</span>
+                            <h3>Loft Central</h3>
+                            <span class="cat">Interiorismo</span>
+                            <span class="year">2025</span>
+                            <span class="arrow" aria-hidden="true">→</span>
+                        </a>
+                    </li>
+                    <li data-gradient="grad-3">
+                        <a href="#proyecto-identidad-nova">
+                            <span class="num">03</span>
+                            <h3>Identidad Nova</h3>
+                            <span class="cat">Diseño Gráfico</span>
+                            <span class="year">2025</span>
+                            <span class="arrow" aria-hidden="true">→</span>
+                        </a>
+                    </li>
+                    <li data-gradient="grad-4">
+                        <a href="#proyecto-pabellon-urbano">
+                            <span class="num">04</span>
+                            <h3>Pabellón Urbano</h3>
+                            <span class="cat">Arquitectura</span>
+                            <span class="year">2024</span>
+                            <span class="arrow" aria-hidden="true">→</span>
+                        </a>
+                    </li>
+                    <li data-gradient="grad-5">
+                        <a href="#proyecto-editorial-margen">
+                            <span class="num">05</span>
+                            <h3>Editorial Márgen</h3>
+                            <span class="cat">Diseño Editorial</span>
+                            <span class="year">2024</span>
+                            <span class="arrow" aria-hidden="true">→</span>
+                        </a>
+                    </li>
+                    <li data-gradient="grad-6">
+                        <a href="#proyecto-refugio-costero">
+                            <span class="num">06</span>
+                            <h3>Refugio Costero</h3>
+                            <span class="cat">Arquitectura</span>
+                            <span class="year">2023</span>
+                            <span class="arrow" aria-hidden="true">→</span>
+                        </a>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- =================== PANTALLA: SOBRE MÍ =================== -->
+            <section class="screen" id="screen-sobre-mi">
+                <div class="screen-header">
+                    <h2>Sobre <em class="serif">mí.</em></h2>
+                    <div class="count">CV disponible</div>
+                </div>
+
+                <div class="about-grid">
+                    <div class="about-portrait"></div>
+                    <div class="about-text">
+                        <h2>Arquitecto y diseñador gráfico con <em>pasión</em> por los detalles.</h2>
+                        <p>
+                            <strong>Tu nombre</strong> es un profesional multidisciplinar con más de 10 años de
+                            experiencia en arquitectura, diseño de interiores y comunicación visual.
+                        </p>
+                        <p>
+                            Graduado en Arquitectura por [Universidad] y especializado en Diseño Gráfico, mi trabajo
+                            explora la relación entre el espacio físico y la identidad visual, buscando siempre la
+                            coherencia entre forma, función y narrativa.
+                        </p>
+                        <p>
+                            He colaborado con estudios internacionales y desarrollado proyectos propios que han sido
+                            publicados en revistas como [Revista 1], [Revista 2] y [Revista 3].
+                        </p>
+                        <a href="#" class="btn-download">Descargar CV (PDF) →</a>
+                    </div>
+                </div>
+
+                <div class="skills">
+                    <div>
+                        <h4>Arquitectura</h4>
+                        <ul>
+                            <li>Revit</li>
+                            <li>AutoCAD</li>
+                            <li>ArchiCAD</li>
+                            <li>SketchUp</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4>Visualización</h4>
+                        <ul>
+                            <li>V-Ray</li>
+                            <li>Lumion</li>
+                            <li>Enscape</li>
+                            <li>Blender</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4>Diseño Gráfico</h4>
+                        <ul>
+                            <li>Photoshop</li>
+                            <li>Illustrator</li>
+                            <li>InDesign</li>
+                            <li>Figma</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4>Otros</h4>
+                        <ul>
+                            <li>After Effects</li>
+                            <li>Premiere</li>
+                            <li>Rhino</li>
+                            <li>Grasshopper</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- =================== PANTALLA: CONTACTO =================== -->
+            <section class="screen" id="screen-contacto">
+                <div class="screen-header">
+                    <h2>Hablemos<em class="serif">.</em></h2>
+                    <div class="count">Disponible para proyectos</div>
+                </div>
+
+                <div class="contact-big">
+                    <a href="mailto:hola@tunombre.com">hola@tunombre.com</a>
+                </div>
+
+                <div class="contact-grid">
+                    <div>
+                        <h4>Teléfono</h4>
+                        <a href="tel:+000000000">+00 000 000 000</a>
+                    </div>
+                    <div>
+                        <h4>Estudio</h4>
+                        <p>Calle Ejemplo 123<br />Ciudad, País</p>
+                    </div>
+                    <div>
+                        <h4>Social</h4>
+                        <a href="#">Instagram ↗</a>
+                        <a href="#">Behance ↗</a>
+                        <a href="#">LinkedIn ↗</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- =================== PROYECTO: CASA HORIZONTE =================== -->
+            <article class="screen" id="screen-proyecto-casa-horizonte">
+                <a href="#proyectos" class="back-link">← Todos los proyectos</a>
+
+                <div class="screen-header">
+                    <h1>Casa <em class="serif">Horizonte.</em></h1>
+                    <div class="count">01 / 06</div>
+                </div>
+
+                <div class="project-image project-cover grad-1" data-label="Imagen principal"></div>
+
+                <dl class="project-meta">
+                    <div>
+                        <dt>Categoría</dt>
+                        <dd>Arquitectura</dd>
+                    </div>
+                    <div>
+                        <dt>Año</dt>
+                        <dd>2026</dd>
+                    </div>
+                    <div>
+                        <dt>Rol</dt>
+                        <dd>Proyecto y dirección de obra</dd>
+                    </div>
+                    <div>
+                        <dt>Ubicación</dt>
+                        <dd>[Ciudad, País]</dd>
+                    </div>
+                </dl>
+
+                <div class="project-body">
+                    <h2>Sobre el proyecto</h2>
+                    <div class="project-text">
+                        <p>Vivienda unifamiliar organizada en torno a una idea sencilla: que el horizonte esté presente desde cada estancia. El volumen se abre al paisaje y se cierra al camino, filtrando la luz a lo largo del día.</p>
+                        <p>La materialidad es austera —hormigón visto, madera y vidrio— y busca que el paso del tiempo mejore la casa en lugar de desgastarla.</p>
+                    </div>
+                </div>
+
+                <div class="project-gallery">
+                    <div class="project-image wide grad-1" data-label="Imagen 1"></div>
+                    <div class="project-image grad-2" data-label="Imagen 2"></div>
+                    <div class="project-image grad-3" data-label="Imagen 3"></div>
+                </div>
+
+                <nav class="project-nav" aria-label="Más proyectos">
+                    <a href="#proyecto-refugio-costero" class="prev">
+                        <small>← Anterior</small>
+                        <span>Refugio Costero</span>
+                    </a>
+                    <a href="#proyecto-loft-central" class="next">
+                        <small>Siguiente →</small>
+                        <span>Loft Central</span>
+                    </a>
+                </nav>
+            </article>
+
+            <!-- =================== PROYECTO: LOFT CENTRAL =================== -->
+            <article class="screen" id="screen-proyecto-loft-central">
+                <a href="#proyectos" class="back-link">← Todos los proyectos</a>
+
+                <div class="screen-header">
+                    <h1>Loft <em class="serif">Central.</em></h1>
+                    <div class="count">02 / 06</div>
+                </div>
+
+                <div class="project-image project-cover grad-2" data-label="Imagen principal"></div>
+
+                <dl class="project-meta">
+                    <div>
+                        <dt>Categoría</dt>
+                        <dd>Interiorismo</dd>
+                    </div>
+                    <div>
+                        <dt>Año</dt>
+                        <dd>2025</dd>
+                    </div>
+                    <div>
+                        <dt>Rol</dt>
+                        <dd>Diseño de interior y mobiliario</dd>
+                    </div>
+                    <div>
+                        <dt>Ubicación</dt>
+                        <dd>[Ciudad, País]</dd>
+                    </div>
+                </dl>
+
+                <div class="project-body">
+                    <h2>Sobre el proyecto</h2>
+                    <div class="project-text">
+                        <p>Reforma integral de un loft de doble altura en pleno centro. El encargo pedía un espacio abierto que pudiera funcionar a la vez como vivienda y como estudio.</p>
+                        <p>Un único mueble continuo ordena almacenamiento, cocina y escalera, dejando libre el resto de la planta y la luz de las grandes ventanas.</p>
+                    </div>
+                </div>
+
+                <div class="project-gallery">
+                    <div class="project-image wide grad-2" data-label="Imagen 1"></div>
+                    <div class="project-image grad-3" data-label="Imagen 2"></div>
+                    <div class="project-image grad-4" data-label="Imagen 3"></div>
+                </div>
+
+                <nav class="project-nav" aria-label="Más proyectos">
+                    <a href="#proyecto-casa-horizonte" class="prev">
+                        <small>← Anterior</small>
+                        <span>Casa Horizonte</span>
+                    </a>
+                    <a href="#proyecto-identidad-nova" class="next">
+                        <small>Siguiente →</small>
+                        <span>Identidad Nova</span>
+                    </a>
+                </nav>
+            </article>
+
+            <!-- =================== PROYECTO: IDENTIDAD NOVA =================== -->
+            <article class="screen" id="screen-proyecto-identidad-nova">
+                <a href="#proyectos" class="back-link">← Todos los proyectos</a>
+
+                <div class="screen-header">
+                    <h1>Identidad <em class="serif">Nova.</em></h1>
+                    <div class="count">03 / 06</div>
+                </div>
+
+                <div class="project-image project-cover grad-3" data-label="Imagen principal"></div>
+
+                <dl class="project-meta">
+                    <div>
+                        <dt>Categoría</dt>
+                        <dd>Diseño Gráfico</dd>
+                    </div>
+                    <div>
+                        <dt>Año</dt>
+                        <dd>2025</dd>
+                    </div>
+                    <div>
+                        <dt>Rol</dt>
+                        <dd>Identidad visual</dd>
+                    </div>
+                    <div>
+                        <dt>Cliente</dt>
+                        <dd>[Nombre del cliente]</dd>
+                    </div>
+                </dl>
+
+                <div class="project-body">
+                    <h2>Sobre el proyecto</h2>
+                    <div class="project-text">
+                        <p>Identidad visual completa para Nova, una marca que necesitaba comunicar precisión sin perder cercanía. El sistema parte de un logotipo sencillo y una paleta contenida.</p>
+                        <p>Incluye logotipo, tipografía, papelería, guía de uso y una serie de plantillas para que el equipo del cliente mantenga la coherencia por su cuenta.</p>
+                    </div>
+                </div>
+
+                <div class="project-gallery">
+                    <div class="project-image wide grad-3" data-label="Imagen 1"></div>
+                    <div class="project-image grad-4" data-label="Imagen 2"></div>
+                    <div class="project-image grad-5" data-label="Imagen 3"></div>
+                </div>
+
+                <nav class="project-nav" aria-label="Más proyectos">
+                    <a href="#proyecto-loft-central" class="prev">
+                        <small>← Anterior</small>
+                        <span>Loft Central</span>
+                    </a>
+                    <a href="#proyecto-pabellon-urbano" class="next">
+                        <small>Siguiente →</small>
+                        <span>Pabellón Urbano</span>
+                    </a>
+                </nav>
+            </article>
+
+            <!-- =================== PROYECTO: PABELLÓN URBANO =================== -->
+            <article class="screen" id="screen-proyecto-pabellon-urbano">
+                <a href="#proyectos" class="back-link">← Todos los proyectos</a>
+
+                <div class="screen-header">
+                    <h1>Pabellón <em class="serif">Urbano.</em></h1>
+                    <div class="count">04 / 06</div>
+                </div>
+
+                <div class="project-image project-cover grad-4" data-label="Imagen principal"></div>
+
+                <dl class="project-meta">
+                    <div>
+                        <dt>Categoría</dt>
+                        <dd>Arquitectura</dd>
+                    </div>
+                    <div>
+                        <dt>Año</dt>
+                        <dd>2024</dd>
+                    </div>
+                    <div>
+                        <dt>Rol</dt>
+                        <dd>Proyecto y dirección de obra</dd>
+                    </div>
+                    <div>
+                        <dt>Ubicación</dt>
+                        <dd>[Ciudad, País]</dd>
+                    </div>
+                </dl>
+
+                <div class="project-body">
+                    <h2>Sobre el proyecto</h2>
+                    <div class="project-text">
+                        <p>Pabellón temporal pensado como lugar de encuentro en el espacio público. Una estructura ligera y desmontable que cubre sin cerrar y que invita a quedarse.</p>
+                        <p>El diseño prioriza la construcción en seco y la reutilización de componentes, de modo que la pieza pueda montarse de nuevo en otro emplazamiento.</p>
+                    </div>
+                </div>
+
+                <div class="project-gallery">
+                    <div class="project-image wide grad-4" data-label="Imagen 1"></div>
+                    <div class="project-image grad-5" data-label="Imagen 2"></div>
+                    <div class="project-image grad-6" data-label="Imagen 3"></div>
+                </div>
+
+                <nav class="project-nav" aria-label="Más proyectos">
+                    <a href="#proyecto-identidad-nova" class="prev">
+                        <small>← Anterior</small>
+                        <span>Identidad Nova</span>
+                    </a>
+                    <a href="#proyecto-editorial-margen" class="next">
+                        <small>Siguiente →</small>
+                        <span>Editorial Márgen</span>
+                    </a>
+                </nav>
+            </article>
+
+            <!-- =================== PROYECTO: EDITORIAL MÁRGEN =================== -->
+            <article class="screen" id="screen-proyecto-editorial-margen">
+                <a href="#proyectos" class="back-link">← Todos los proyectos</a>
+
+                <div class="screen-header">
+                    <h1>Editorial <em class="serif">Márgen.</em></h1>
+                    <div class="count">05 / 06</div>
+                </div>
+
+                <div class="project-image project-cover grad-5" data-label="Imagen principal"></div>
+
+                <dl class="project-meta">
+                    <div>
+                        <dt>Categoría</dt>
+                        <dd>Diseño Editorial</dd>
+                    </div>
+                    <div>
+                        <dt>Año</dt>
+                        <dd>2024</dd>
+                    </div>
+                    <div>
+                        <dt>Rol</dt>
+                        <dd>Dirección de arte y maquetación</dd>
+                    </div>
+                    <div>
+                        <dt>Cliente</dt>
+                        <dd>[Nombre de la editorial]</dd>
+                    </div>
+                </dl>
+
+                <div class="project-body">
+                    <h2>Sobre el proyecto</h2>
+                    <div class="project-text">
+                        <p>Diseño editorial de una colección de libros de ensayo. La maqueta trabaja con márgenes amplios y una jerarquía tipográfica clara que facilita la lectura sostenida.</p>
+                        <p>Cada volumen comparte la misma retícula y varía en el color y la composición de la cubierta, para que la colección se reconozca de un vistazo.</p>
+                    </div>
+                </div>
+
+                <div class="project-gallery">
+                    <div class="project-image wide grad-5" data-label="Imagen 1"></div>
+                    <div class="project-image grad-6" data-label="Imagen 2"></div>
+                    <div class="project-image grad-1" data-label="Imagen 3"></div>
+                </div>
+
+                <nav class="project-nav" aria-label="Más proyectos">
+                    <a href="#proyecto-pabellon-urbano" class="prev">
+                        <small>← Anterior</small>
+                        <span>Pabellón Urbano</span>
+                    </a>
+                    <a href="#proyecto-refugio-costero" class="next">
+                        <small>Siguiente →</small>
+                        <span>Refugio Costero</span>
+                    </a>
+                </nav>
+            </article>
+
+            <!-- =================== PROYECTO: REFUGIO COSTERO =================== -->
+            <article class="screen" id="screen-proyecto-refugio-costero">
+                <a href="#proyectos" class="back-link">← Todos los proyectos</a>
+
+                <div class="screen-header">
+                    <h1>Refugio <em class="serif">Costero.</em></h1>
+                    <div class="count">06 / 06</div>
+                </div>
+
+                <div class="project-image project-cover grad-6" data-label="Imagen principal"></div>
+
+                <dl class="project-meta">
+                    <div>
+                        <dt>Categoría</dt>
+                        <dd>Arquitectura</dd>
+                    </div>
+                    <div>
+                        <dt>Año</dt>
+                        <dd>2023</dd>
+                    </div>
+                    <div>
+                        <dt>Rol</dt>
+                        <dd>Proyecto y dirección de obra</dd>
+                    </div>
+                    <div>
+                        <dt>Ubicación</dt>
+                        <dd>[Ciudad, País]</dd>
+                    </div>
+                </dl>
+
+                <div class="project-body">
+                    <h2>Sobre el proyecto</h2>
+                    <div class="project-text">
+                        <p>Pequeña casa de descanso frente al mar, concebida como refugio ante el viento y la sal. Una planta compacta agrupa los espacios de día y de noche en torno a un patio protegido.</p>
+                        <p>Los materiales se eligieron por su resistencia al ambiente marino y por cómo envejecen: madera tratada, piedra local y cubierta metálica.</p>
+                    </div>
+                </div>
+
+                <div class="project-gallery">
+                    <div class="project-image wide grad-6" data-label="Imagen 1"></div>
+                    <div class="project-image grad-1" data-label="Imagen 2"></div>
+                    <div class="project-image grad-2" data-label="Imagen 3"></div>
+                </div>
+
+                <nav class="project-nav" aria-label="Más proyectos">
+                    <a href="#proyecto-editorial-margen" class="prev">
+                        <small>← Anterior</small>
+                        <span>Editorial Márgen</span>
+                    </a>
+                    <a href="#proyecto-casa-horizonte" class="next">
+                        <small>Siguiente →</small>
+                        <span>Casa Horizonte</span>
+                    </a>
+                </nav>
+            </article>
+        </main>
+
+        <!-- FOOTER -->
+        <footer>
+            <span>© 2026 — Tu Nombre</span>
+            <span>Arquitecto &amp; Diseñador Gráfico</span>
+            <span id="currentTime"></span>
+        </footer>
+    </body>
 </html>
